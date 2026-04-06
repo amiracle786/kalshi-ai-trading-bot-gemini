@@ -319,6 +319,16 @@ class DatabaseManager(TradingLoggerMixin):
             )
         """)
 
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS blocked_trades (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                market_id TEXT NOT NULL,
+                side TEXT,
+                reason TEXT,
+                timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
         # Create indices for performance
         await db.execute("CREATE INDEX IF NOT EXISTS idx_market_analyses_market_id ON market_analyses(market_id)")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_market_analyses_timestamp ON market_analyses(analysis_timestamp)")

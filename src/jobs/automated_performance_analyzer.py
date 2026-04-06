@@ -117,7 +117,7 @@ class AutomatedPerformanceAnalyzer:
         Returns:
             Complete analysis report with metrics, risk checks, and action items
         """
-        self.logger.info("🚀 Starting automated performance analysis")
+        self.logger.info("[START] Starting automated performance analysis")
         
         try:
             # Gather current state
@@ -153,7 +153,7 @@ class AutomatedPerformanceAnalyzer:
             await self._save_analysis_report(report)
             
             self.logger.info(
-                "✅ Automated analysis completed",
+                "[OK] Automated analysis completed",
                 critical_issues=report['summary']['total_critical_issues'],
                 warnings=report['summary']['total_warnings'],
                 health_score=report['summary']['overall_health_score']
@@ -162,7 +162,7 @@ class AutomatedPerformanceAnalyzer:
             return report
             
         except Exception as e:
-            self.logger.error(f"❌ Analysis failed: {e}")
+            self.logger.error(f"[FAIL] Analysis failed: {e}")
             raise
     
     async def _gather_portfolio_data(self) -> Dict[str, Any]:
@@ -657,7 +657,7 @@ if __name__ == "__main__":
     async def main():
         report = await run_performance_analysis()
         
-        print("🎯 AUTOMATED PERFORMANCE ANALYSIS RESULTS")
+        print("[TARGET] AUTOMATED PERFORMANCE ANALYSIS RESULTS")
         print("=" * 60)
         print(f"Health Score: {report['summary']['overall_health_score']:.1f}/100")
         print(f"Critical Issues: {report['summary']['total_critical_issues']}")

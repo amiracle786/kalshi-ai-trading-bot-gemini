@@ -134,7 +134,7 @@ async def analyze_ai_costs(db_manager: DatabaseManager) -> Dict:
 
     if today_cost > soft_budget * 0.8:
         recommendations.append(
-            f"⚠️  Near soft budget threshold: ${today_cost:.3f} / ${soft_budget:.2f}"
+            f"[WARNING]  Near soft budget threshold: ${today_cost:.3f} / ${soft_budget:.2f}"
         )
 
     if today_cost > actual_limit * 0.8:
@@ -143,13 +143,13 @@ async def analyze_ai_costs(db_manager: DatabaseManager) -> Dict:
         )
 
     if cost_per_decision > settings.trading.max_ai_cost_per_decision:
-        recommendations.append(f"💰 High cost per decision: ${cost_per_decision:.3f}")
+        recommendations.append(f"[MONEY] High cost per decision: ${cost_per_decision:.3f}")
 
     if weekly_cost > soft_budget * 5:  # More than 5 days of soft budget in a week
-        recommendations.append("📈 Weekly spending trending high - consider tighter controls")
+        recommendations.append("[UP] Weekly spending trending high - consider tighter controls")
 
     if weekly_analyses > weekly_decisions * 3:  # Too many analyses relative to decisions
-        recommendations.append("🔄 High analysis-to-decision ratio - improve filtering")
+        recommendations.append("[CYCLE] High analysis-to-decision ratio - improve filtering")
 
     # Log comprehensive cost report
     logger.info(

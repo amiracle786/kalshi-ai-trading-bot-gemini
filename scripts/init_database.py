@@ -25,8 +25,8 @@ async def init_database():
         # Create tables
         await db_manager.create_tables()
         
-        print("✅ Database initialized successfully!")
-        print("📊 Created tables:")
+        print("[OK] Database initialized successfully!")
+        print("[DATA] Created tables:")
         print("   - markets")
         print("   - positions") 
         print("   - trade_logs")
@@ -37,19 +37,19 @@ async def init_database():
         await db_manager.close()
         
     except Exception as e:
-        print(f"❌ Database initialization failed: {e}")
+        print(f"[FAIL] Database initialization failed: {e}")
         sys.exit(1)
 
 
 def main():
     """Main function."""
-    print("🚀 Kalshi AI Trading Bot - Database Initialization")
+    print("[START] Kalshi AI Trading Bot - Database Initialization")
     print("=" * 50)
     
     # Check if .env file exists
     env_file = Path(".env")
     if not env_file.exists():
-        print("⚠️  Warning: .env file not found")
+        print("[WARNING]  Warning: .env file not found")
         print("   Please create a .env file with your API keys before running the bot")
         print("   You can copy env.template to .env and fill in your keys")
     

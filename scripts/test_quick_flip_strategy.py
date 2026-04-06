@@ -35,7 +35,7 @@ async def test_quick_flip_opportunities():
     setup_logging()
     logger = logging.getLogger("quick_flip_test")
     
-    logger.info("🎯 Testing Quick Flip Strategy - Opportunity Identification")
+    logger.info("[TARGET] Testing Quick Flip Strategy - Opportunity Identification")
     
     # Initialize clients
     kalshi_client = KalshiClient()
@@ -67,14 +67,14 @@ async def test_quick_flip_opportunities():
             logger.error("No markets available for testing")
             return
         
-        logger.info(f"📊 Analyzing {len(markets)} markets for quick flip opportunities")
+        logger.info(f"[DATA] Analyzing {len(markets)} markets for quick flip opportunities")
         
         # Identify opportunities (but don't execute)
         opportunities = await strategy.identify_quick_flip_opportunities(
             markets, available_capital=500.0  # $500 test capital
         )
         
-        logger.info(f"🎯 Found {len(opportunities)} quick flip opportunities:")
+        logger.info(f"[TARGET] Found {len(opportunities)} quick flip opportunities:")
         
         for i, opp in enumerate(opportunities[:5]):  # Show top 5
             logger.info(
@@ -88,9 +88,9 @@ async def test_quick_flip_opportunities():
             )
         
         if opportunities:
-            logger.info("✅ Quick flip opportunity identification successful!")
-            logger.info("💡 This strategy would place immediate sell orders after buying")
-            logger.info("⚡ Targets rapid 100%+ returns on low-priced contracts")
+            logger.info("[OK] Quick flip opportunity identification successful!")
+            logger.info("[IDEA] This strategy would place immediate sell orders after buying")
+            logger.info("[POWER] Targets rapid 100%+ returns on low-priced contracts")
         else:
             logger.info("ℹ️ No opportunities found with current market conditions")
         
@@ -109,7 +109,7 @@ async def test_quick_flip_full_strategy():
     setup_logging()
     logger = logging.getLogger("quick_flip_full_test")
     
-    logger.info("🚀 Testing Full Quick Flip Strategy - PAPER MODE")
+    logger.info("[START] Testing Full Quick Flip Strategy - PAPER MODE")
     
     # Initialize clients
     kalshi_client = KalshiClient()
@@ -146,7 +146,7 @@ async def test_quick_flip_full_strategy():
             config=config
         )
         
-        logger.info("📊 Quick Flip Strategy Results:")
+        logger.info("[DATA] Quick Flip Strategy Results:")
         logger.info(f"  • Opportunities Analyzed: {results.get('opportunities_analyzed', 0)}")
         logger.info(f"  • Positions Created: {results.get('positions_created', 0)}")
         logger.info(f"  • Sell Orders Placed: {results.get('sell_orders_placed', 0)}")
@@ -155,8 +155,8 @@ async def test_quick_flip_full_strategy():
         logger.info(f"  • Failed Executions: {results.get('failed_executions', 0)}")
         
         if results.get('positions_created', 0) > 0:
-            logger.info("✅ Quick flip strategy executed successfully!")
-            logger.info("💡 In live mode, this would place real orders and immediate sell limits")
+            logger.info("[OK] Quick flip strategy executed successfully!")
+            logger.info("[IDEA] In live mode, this would place real orders and immediate sell limits")
         else:
             logger.info("ℹ️ No trades executed - either no opportunities or all filtered out")
         
@@ -174,10 +174,10 @@ async def demo_strategy_concept():
     
     logger = logging.getLogger("quick_flip_demo")
     
-    logger.info("🎯 QUICK FLIP SCALPING STRATEGY CONCEPT")
+    logger.info("[TARGET] QUICK FLIP SCALPING STRATEGY CONCEPT")
     logger.info("=" * 60)
     
-    logger.info("📈 STRATEGY OVERVIEW:")
+    logger.info("[UP] STRATEGY OVERVIEW:")
     logger.info("  1. Find contracts priced at 1¢-20¢ (low cost, high % return potential)")
     logger.info("  2. Use AI to identify likely short-term price movement catalysts")
     logger.info("  3. Buy contracts at low prices")
@@ -185,13 +185,13 @@ async def demo_strategy_concept():
     logger.info("  5. Hold for maximum 30 minutes, then cut losses if needed")
     logger.info("")
     
-    logger.info("💡 EXAMPLE SCENARIOS:")
+    logger.info("[IDEA] EXAMPLE SCENARIOS:")
     logger.info("  Scenario A: Buy YES at 1¢ → Sell at 2¢ = 100% return")
     logger.info("  Scenario B: Buy NO at 5¢ → Sell at 10¢ = 100% return") 
     logger.info("  Scenario C: Buy YES at 3¢ → Sell at 7¢ = 133% return")
     logger.info("")
     
-    logger.info("⚡ ADVANTAGES:")
+    logger.info("[POWER] ADVANTAGES:")
     logger.info("  • Low capital requirement per trade")
     logger.info("  • High percentage returns on small price movements")
     logger.info("  • Quick turnover - capital not tied up long-term")
@@ -206,14 +206,14 @@ async def demo_strategy_concept():
     logger.info("  • Capital allocation limits")
     logger.info("")
     
-    logger.info("🚀 INTEGRATION:")
+    logger.info("[START] INTEGRATION:")
     logger.info("  • Added to unified trading system (20% capital allocation)")
     logger.info("  • Runs parallel with market making and directional strategies")
     logger.info("  • Uses existing order placement and tracking infrastructure")
 
 
 if __name__ == "__main__":
-    print("🎯 Quick Flip Scalping Strategy Test Suite")
+    print("[TARGET] Quick Flip Scalping Strategy Test Suite")
     print("=" * 50)
     
     async def main():

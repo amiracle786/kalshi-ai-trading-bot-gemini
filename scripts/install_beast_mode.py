@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Beast Mode Installation Script 🚀
+Beast Mode Installation Script [START]
 
 This script installs dependencies and validates the Beast Mode trading system.
 
@@ -15,38 +15,38 @@ from pathlib import Path
 
 def run_command(command, description):
     """Run a command and handle errors."""
-    print(f"🔄 {description}...")
+    print(f"[CYCLE] {description}...")
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        print(f"✅ {description} completed!")
+        print(f"[OK] {description} completed!")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ {description} failed: {e.stderr}")
+        print(f"[FAIL] {description} failed: {e.stderr}")
         return False
 
 def main():
-    print("🚀 BEAST MODE INSTALLATION SCRIPT 🚀")
+    print("[START] BEAST MODE INSTALLATION SCRIPT [START]")
     print("=" * 50)
     
     # Check Python version
     if sys.version_info < (3, 8):
-        print(f"❌ Python 3.8+ required. Current: {sys.version}")
+        print(f"[FAIL] Python 3.8+ required. Current: {sys.version}")
         return False
     
-    print(f"✅ Python version: {sys.version.split()[0]}")
+    print(f"[OK] Python version: {sys.version.split()[0]}")
     
     # Install requirements
     if not run_command("pip install -r requirements.txt", "Installing dependencies"):
-        print("❌ Failed to install dependencies. Try manually: pip install scipy pandas numpy")
+        print("[FAIL] Failed to install dependencies. Try manually: pip install scipy pandas numpy")
         return False
     
     # Test imports
     print("\n🧪 Testing Beast Mode components...")
     
     test_commands = [
-        ("python -c 'import numpy; print(\"✅ NumPy:\", numpy.__version__)'", "NumPy"),
-        ("python -c 'import scipy; print(\"✅ SciPy:\", scipy.__version__)'", "SciPy"),
-        ("python -c 'import pandas; print(\"✅ Pandas:\", pandas.__version__)'", "Pandas"),
+        ("python -c 'import numpy; print(\"[OK] NumPy:\", numpy.__version__)'", "NumPy"),
+        ("python -c 'import scipy; print(\"[OK] SciPy:\", scipy.__version__)'", "SciPy"),
+        ("python -c 'import pandas; print(\"[OK] Pandas:\", pandas.__version__)'", "Pandas"),
     ]
     
     for command, name in test_commands:
@@ -54,7 +54,7 @@ def main():
             return False
     
     # Test Beast Mode imports
-    print("\n🚀 Testing Beast Mode system...")
+    print("\n[START] Testing Beast Mode system...")
     
     beast_test = """
 try:
@@ -62,10 +62,10 @@ try:
     from src.jobs.trade import run_trading_job
     from src.strategies.portfolio_optimization import AdvancedPortfolioOptimizer
     from src.strategies.market_making import AdvancedMarketMaker
-    print('✅ All Beast Mode components imported successfully!')
-    print('🚀 BEAST MODE READY FOR DEPLOYMENT!')
+    print('[OK] All Beast Mode components imported successfully!')
+    print('[START] BEAST MODE READY FOR DEPLOYMENT!')
 except Exception as e:
-    print(f'❌ Beast Mode import error: {e}')
+    print(f'[FAIL] Beast Mode import error: {e}')
     import traceback
     traceback.print_exc()
 """
@@ -74,9 +74,9 @@ except Exception as e:
         return False
     
     # Success message
-    print("\n" + "🚀" * 20)
+    print("\n" + "[START]" * 20)
     print("BEAST MODE INSTALLATION COMPLETE!")
-    print("🚀" * 20)
+    print("[START]" * 20)
     
     print("\n📚 NEXT STEPS:")
     print("1. Run the dashboard: python beast_mode_dashboard.py --summary")

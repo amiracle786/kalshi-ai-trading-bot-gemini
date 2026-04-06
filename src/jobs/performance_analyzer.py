@@ -39,7 +39,7 @@ class TradingPerformanceAnalyzer:
     async def run_comprehensive_analysis(self) -> Dict[str, Any]:
         """Run comprehensive performance analysis and generate improvement recommendations."""
         
-        self.logger.info("🔍 Starting comprehensive trading performance analysis")
+        self.logger.info("[SEARCH] Starting comprehensive trading performance analysis")
         
         try:
             # Gather all performance data
@@ -342,7 +342,7 @@ Focus on actionable insights that can immediately improve performance.
         portfolio = report.get('performance_data', {}).get('portfolio', {})
         
         self.logger.info(
-            "📊 Performance Analysis Complete",
+            "[DATA] Performance Analysis Complete",
             win_rate=f"{perf.get('win_rate', 0):.1%}",
             total_pnl=f"${perf.get('total_pnl', 0):.2f}",
             active_positions=portfolio.get('active_positions', 0),
@@ -363,7 +363,7 @@ async def run_performance_analysis(
         Comprehensive performance analysis report
     """
     logger = get_trading_logger("performance_analysis")
-    logger.info("🚀 Starting automated performance analysis")
+    logger.info("[START] Starting automated performance analysis")
     
     # Initialize clients if not provided
     if db_manager is None:
@@ -380,7 +380,7 @@ async def run_performance_analysis(
         analyzer = TradingPerformanceAnalyzer(db_manager, kalshi_client, xai_client)
         report = await analyzer.run_comprehensive_analysis()
         
-        logger.info("✅ Performance analysis completed successfully")
+        logger.info("[OK] Performance analysis completed successfully")
         return report
         
     except Exception as e:

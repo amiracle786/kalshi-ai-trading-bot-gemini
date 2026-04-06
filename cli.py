@@ -41,7 +41,7 @@ def cmd_run(args: argparse.Namespace) -> None:
     live_mode = live and not paper
 
     if live_mode:
-        print("⚠️  WARNING: LIVE TRADING MODE ENABLED")
+        print("[WARNING] LIVE TRADING MODE ENABLED")
         print("   This will use real money and place actual trades.")
 
     # --safe-compounder mode: edge-based NO-side only
@@ -51,7 +51,7 @@ def cmd_run(args: argparse.Namespace) -> None:
 
     # --beast mode: original aggressive settings (NOT default)
     if beast:
-        print("⚠️  BEAST MODE: Aggressive settings enabled.")
+        print("[WARNING] BEAST MODE: Aggressive settings enabled.")
         print("   WARNING: Aggressive settings with no guardrails. Use at your own risk.")
         from beast_mode_bot import BeastModeBot
         bot = BeastModeBot(live_mode=live_mode)
@@ -62,7 +62,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         return
 
     # DEFAULT: disciplined mode (with or without --disciplined flag)
-    print("🛡️  DISCIPLINED MODE (default)")
+    print("[INFO] DISCIPLINED MODE (default)")
     print("   Category scoring + portfolio enforcement active.")
     print("   Use --beast to run without guardrails (not recommended).")
 

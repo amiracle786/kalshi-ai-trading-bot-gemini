@@ -315,12 +315,12 @@ class PerformanceDashboardIntegration:
         
         for alert in alerts[:3]:  # Top 3 alerts
             if alert.priority == 'CRITICAL':
-                improvements.append(f"🚨 {alert.title}")
+                improvements.append(f"[ALERT] {alert.title}")
             else:
-                improvements.append(f"⚠️ {alert.title}")
+                improvements.append(f"[WARNING] {alert.title}")
         
         if not improvements:
-            improvements.append("✅ No critical issues detected")
+            improvements.append("[OK] No critical issues detected")
         
         return improvements
     
@@ -337,7 +337,7 @@ class PerformanceDashboardIntegration:
     
     async def trigger_emergency_analysis(self) -> Dict[str, Any]:
         """Trigger emergency analysis and return results."""
-        self.logger.info("🚨 Triggering emergency performance analysis")
+        self.logger.info("[ALERT] Triggering emergency performance analysis")
         
         try:
             report = await run_performance_analysis()
@@ -371,7 +371,7 @@ class PerformanceDashboardIntegration:
                 ]
             
             self.logger.info(
-                "🚨 Emergency analysis completed",
+                "[ALERT] Emergency analysis completed",
                 health_score=emergency_summary['health_score'],
                 critical_issues=emergency_summary['critical_issues']
             )
@@ -379,7 +379,7 @@ class PerformanceDashboardIntegration:
             return emergency_summary
             
         except Exception as e:
-            self.logger.error(f"❌ Emergency analysis failed: {e}")
+            self.logger.error(f"[FAIL] Emergency analysis failed: {e}")
             return {
                 'timestamp': datetime.now().isoformat(),
                 'error': str(e),
@@ -445,12 +445,12 @@ if __name__ == "__main__":
     async def main():
         if args.metrics:
             metrics = await dashboard_get_metrics()
-            print("📊 CURRENT METRICS:")
+            print("[DATA] CURRENT METRICS:")
             print(json.dumps(metrics, indent=2, default=str))
         
         elif args.alerts:
             alerts = await dashboard_get_alerts()
-            print("🚨 CRITICAL ALERTS:")
+            print("[ALERT] CRITICAL ALERTS:")
             print(json.dumps(alerts, indent=2, default=str))
         
         elif args.summary:
@@ -460,7 +460,7 @@ if __name__ == "__main__":
         
         elif args.emergency:
             result = await dashboard_trigger_analysis()
-            print("🚨 EMERGENCY ANALYSIS:")
+            print("[ALERT] EMERGENCY ANALYSIS:")
             print(json.dumps(result, indent=2, default=str))
         
         else:

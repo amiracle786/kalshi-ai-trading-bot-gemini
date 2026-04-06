@@ -58,7 +58,7 @@ class PerformanceSystemManager:
         
     async def start_system(self, config: Optional[ScheduleConfig] = None) -> None:
         """Start the complete performance analysis system."""
-        self.logger.info("🚀 Starting Kalshi Performance Analysis System")
+        self.logger.info("[START] Starting Kalshi Performance Analysis System")
         
         try:
             # Start the automated scheduler
@@ -69,7 +69,7 @@ class PerformanceSystemManager:
             initial_summary = await dashboard_get_summary()
             
             self.logger.info(
-                "✅ Performance system started successfully",
+                "[OK] Performance system started successfully",
                 system_status=initial_summary['system_status'],
                 health_score=initial_summary['metrics']['health_score'],
                 critical_issues=initial_summary['metrics']['critical_issues']
@@ -77,7 +77,7 @@ class PerformanceSystemManager:
             
             # Display startup summary
             print(f"\n{'='*60}")
-            print("🎯 KALSHI PERFORMANCE ANALYSIS SYSTEM ACTIVE")
+            print("[TARGET] KALSHI PERFORMANCE ANALYSIS SYSTEM ACTIVE")
             print(f"{'='*60}")
             print(f"System Status: {initial_summary['system_status']}")
             print(f"Health Score: {initial_summary['metrics']['health_score']:.1f}/100")
@@ -90,16 +90,16 @@ class PerformanceSystemManager:
             
             # Show critical alerts if any
             if initial_summary['alerts']:
-                print("\n🚨 CRITICAL ALERTS:")
+                print("\n[ALERT] CRITICAL ALERTS:")
                 for alert in initial_summary['alerts']:
-                    priority_icon = "🚨" if alert['priority'] == 'CRITICAL' else "⚠️"
+                    priority_icon = "[ALERT]" if alert['priority'] == 'CRITICAL' else "[WARNING]"
                     print(f"{priority_icon} {alert['title']}")
                     print(f"   {alert['message']}")
                 print(f"{'='*60}")
             
             # Show quick actions
             if initial_summary['quick_actions']:
-                print("\n🎯 QUICK ACTIONS AVAILABLE:")
+                print("\n[TARGET] QUICK ACTIONS AVAILABLE:")
                 for action in initial_summary['quick_actions']:
                     print(f"• {action['title']}")
                 print(f"{'='*60}")
@@ -108,29 +108,29 @@ class PerformanceSystemManager:
             print("Press Ctrl+C to stop the system\n")
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to start performance system: {e}")
+            self.logger.error(f"[FAIL] Failed to start performance system: {e}")
             raise
     
     def stop_system(self) -> None:
         """Stop the performance analysis system."""
-        self.logger.info("🛑 Stopping Performance Analysis System")
+        self.logger.info("[STOP] Stopping Performance Analysis System")
         
         if self.scheduler:
             stop_performance_scheduler()
             self.scheduler = None
         
         self.running = False
-        self.logger.info("✅ Performance system stopped")
+        self.logger.info("[OK] Performance system stopped")
     
     async def run_immediate_analysis(self) -> Dict[str, Any]:
         """Run immediate comprehensive analysis."""
-        self.logger.info("🔍 Running immediate performance analysis")
+        self.logger.info("[SEARCH] Running immediate performance analysis")
         
         try:
             report = await run_performance_analysis()
             
             print(f"\n{'='*60}")
-            print("📊 IMMEDIATE ANALYSIS RESULTS")
+            print("[DATA] IMMEDIATE ANALYSIS RESULTS")
             print(f"{'='*60}")
             print(f"Health Score: {report['summary']['overall_health_score']:.1f}/100")
             print(f"Critical Issues: {report['summary']['total_critical_issues']}")
@@ -140,7 +140,7 @@ class PerformanceSystemManager:
             # Show critical action items
             critical_actions = [a for a in report['action_items'] if a['priority'] == 'CRITICAL']
             if critical_actions:
-                print(f"\n🚨 CRITICAL ACTIONS REQUIRED:")
+                print(f"\n[ALERT] CRITICAL ACTIONS REQUIRED:")
                 for action in critical_actions:
                     print(f"• {action['action']}")
                     print(f"  Target: {action['target_date']}")
@@ -157,14 +157,14 @@ class PerformanceSystemManager:
                 print(f"\n🤖 GROK4 ANALYSIS AVAILABLE:")
                 analysis_preview = report['grok_analysis']['analysis_text'][:200]
                 print(f"{analysis_preview}...")
-                print(f"💰 Analysis Cost: ${report['grok_analysis']['cost']:.4f}")
+                print(f"[MONEY] Analysis Cost: ${report['grok_analysis']['cost']:.4f}")
             
             print(f"{'='*60}\n")
             
             return report
             
         except Exception as e:
-            self.logger.error(f"❌ Analysis failed: {e}")
+            self.logger.error(f"[FAIL] Analysis failed: {e}")
             raise
     
     async def show_system_status(self) -> None:
@@ -173,21 +173,21 @@ class PerformanceSystemManager:
             summary = await dashboard_get_summary()
             
             print(f"\n{'='*60}")
-            print("📊 SYSTEM STATUS")
+            print("[DATA] SYSTEM STATUS")
             print(f"{'='*60}")
             print(f"Overall Status: {summary['system_status']} ({summary['status_color']})")
             print(f"Health Score: {summary['metrics']['health_score']:.1f}/100")
             print(f"Risk Level: {summary['performance_summary']['risk_level']}")
             print(f"Trending: {summary['metrics']['trending']}")
             
-            print(f"\n📈 PORTFOLIO METRICS:")
+            print(f"\n[UP] PORTFOLIO METRICS:")
             print(f"Available Cash: ${summary['metrics']['available_cash']:.2f}")
             print(f"Capital Utilization: {summary['metrics']['capital_utilization']:.1f}%")
             print(f"Active Positions: {summary['metrics']['active_positions']}")
             print(f"Win Rate: {summary['metrics']['win_rate']:.1%}")
             print(f"Total P&L: ${summary['metrics']['total_pnl']:.2f}")
             
-            print(f"\n🚨 ISSUES:")
+            print(f"\n[ALERT] ISSUES:")
             print(f"Critical Issues: {summary['metrics']['critical_issues']}")
             print(f"Warnings: {summary['metrics']['warnings']}")
             
@@ -197,32 +197,32 @@ class PerformanceSystemManager:
             print(f"Next Analysis: {summary['scheduler'].get('next_analysis', 'Unknown')}")
             
             if summary['alerts']:
-                print(f"\n🚨 ACTIVE ALERTS:")
+                print(f"\n[ALERT] ACTIVE ALERTS:")
                 for alert in summary['alerts'][:5]:  # Show top 5
-                    priority_icon = "🚨" if alert['priority'] == 'CRITICAL' else "⚠️"
+                    priority_icon = "[ALERT]" if alert['priority'] == 'CRITICAL' else "[WARNING]"
                     print(f"{priority_icon} {alert['title']}")
             
             print(f"{'='*60}\n")
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to get system status: {e}")
+            self.logger.error(f"[FAIL] Failed to get system status: {e}")
     
     async def emergency_intervention(self) -> None:
         """Run emergency analysis and intervention."""
         print(f"\n{'='*60}")
-        print("🚨 EMERGENCY INTERVENTION MODE")
+        print("[ALERT] EMERGENCY INTERVENTION MODE")
         print(f"{'='*60}")
         print("Running emergency analysis with Grok4...")
         
         try:
             emergency_result = await dashboard_trigger_analysis()
             
-            print(f"\n📊 EMERGENCY ANALYSIS RESULTS:")
+            print(f"\n[DATA] EMERGENCY ANALYSIS RESULTS:")
             print(f"Health Score: {emergency_result['health_score']:.1f}/100")
             print(f"Critical Issues: {emergency_result['critical_issues']}")
             
             if emergency_result.get('urgent_actions'):
-                print(f"\n🚨 URGENT ACTIONS REQUIRED:")
+                print(f"\n[ALERT] URGENT ACTIONS REQUIRED:")
                 for action in emergency_result['urgent_actions']:
                     print(f"• {action['action']}")
                     print(f"  Rationale: {action['rationale']}")
@@ -233,19 +233,19 @@ class PerformanceSystemManager:
                             print(f"    - {step}")
             
             if emergency_result.get('immediate_steps'):
-                print(f"\n⚡ IMMEDIATE STEPS:")
+                print(f"\n[POWER] IMMEDIATE STEPS:")
                 for step in emergency_result['immediate_steps']:
                     print(f"• {step}")
             
             print(f"{'='*60}\n")
             
         except Exception as e:
-            self.logger.error(f"❌ Emergency intervention failed: {e}")
+            self.logger.error(f"[FAIL] Emergency intervention failed: {e}")
     
     async def interactive_mode(self) -> None:
         """Run interactive command mode."""
         print(f"\n{'='*60}")
-        print("🎯 INTERACTIVE PERFORMANCE MANAGEMENT")
+        print("[TARGET] INTERACTIVE PERFORMANCE MANAGEMENT")
         print(f"{'='*60}")
         print("Available commands:")
         print("  status - Show system status")
@@ -272,17 +272,17 @@ class PerformanceSystemManager:
                 elif command == "alerts":
                     alerts = await dashboard_get_alerts()
                     if alerts:
-                        print("\n🚨 CRITICAL ALERTS:")
+                        print("\n[ALERT] CRITICAL ALERTS:")
                         for alert in alerts:
-                            priority_icon = "🚨" if alert['priority'] == 'CRITICAL' else "⚠️"
+                            priority_icon = "[ALERT]" if alert['priority'] == 'CRITICAL' else "[WARNING]"
                             print(f"{priority_icon} {alert['title']}")
                             print(f"   {alert['message']}")
                             print(f"   Action: {alert['action_required']}")
                     else:
-                        print("✅ No critical alerts")
+                        print("[OK] No critical alerts")
                 elif command == "metrics":
                     metrics = await dashboard_get_metrics()
-                    print(f"\n📊 CURRENT METRICS:")
+                    print(f"\n[DATA] CURRENT METRICS:")
                     for key, value in metrics.items():
                         if isinstance(value, float):
                             print(f"{key}: {value:.2f}")
@@ -302,12 +302,12 @@ class PerformanceSystemManager:
                 print("\nExiting interactive mode...")
                 break
             except Exception as e:
-                print(f"❌ Command failed: {e}")
+                print(f"[FAIL] Command failed: {e}")
     
     def setup_signal_handlers(self) -> None:
         """Setup signal handlers for graceful shutdown."""
         def signal_handler(signum, frame):
-            print(f"\n🛑 Received signal {signum}, shutting down gracefully...")
+            print(f"\n[STOP] Received signal {signum}, shutting down gracefully...")
             self.stop_system()
             sys.exit(0)
         
@@ -384,7 +384,7 @@ Examples:
                 while manager.running:
                     await asyncio.sleep(1)
             except KeyboardInterrupt:
-                print("\n🛑 Shutting down...")
+                print("\n[STOP] Shutting down...")
                 manager.stop_system()
         
         elif args.analyze:
@@ -401,10 +401,10 @@ Examples:
         
         else:
             parser.print_help()
-            print(f"\n💡 Quick start: python {parser.prog} --start")
+            print(f"\n[IDEA] Quick start: python {parser.prog} --start")
     
     except Exception as e:
-        print(f"❌ System error: {e}")
+        print(f"[FAIL] System error: {e}")
         sys.exit(1)
 
 

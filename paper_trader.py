@@ -116,7 +116,7 @@ async def scan_and_log():
             )
             signals_logged += 1
             logger.info(
-                f"📝 Signal #{signal_id}: {side} {title} @ {limit_price:.0%} "
+                f"[NOTE] Signal #{signal_id}: {side} {title} @ {limit_price:.0%} "
                 f"(conf={confidence:.0%}) — {reasoning[:60]}"
             )
 
@@ -124,7 +124,7 @@ async def scan_and_log():
             logger.warning(f"Decision failed for market: {e}")
             continue
 
-    logger.info(f"✅ Logged {signals_logged} paper signals")
+    logger.info(f"[OK] Logged {signals_logged} paper signals")
     return signals_logged
 
 
@@ -164,13 +164,13 @@ async def check_settlements():
                 (sig["side"] == "NO" and settlement_price <= 0.5) or
                 (sig["side"] == "YES" and settlement_price >= 0.5)
             ) else "LOSS"
-            logger.info(f"🏁 Signal #{sig['id']} settled: {outcome} — {sig['market_title']}")
+            logger.info(f"[END] Signal #{sig['id']} settled: {outcome} — {sig['market_title']}")
             settled_count += 1
 
         except Exception as e:
             logger.warning(f"Settlement check failed for {sig['market_id']}: {e}")
 
-    logger.info(f"✅ Settled {settled_count}/{len(pending)} pending signals")
+    logger.info(f"[OK] Settled {settled_count}/{len(pending)} pending signals")
     return settled_count
 
 
@@ -180,7 +180,7 @@ async def check_settlements():
 
 def print_stats():
     stats = get_stats()
-    print("\n📊 Paper Trading Stats")
+    print("\n[DATA] Paper Trading Stats")
     print("=" * 40)
     print(f"  Total signals:  {stats['total_signals']}")
     print(f"  Settled:        {stats['settled']}")
@@ -212,13 +212,13 @@ async def main():
 
     if args.dashboard:
         generate_html(DASHBOARD_OUT)
-        print(f"✅ Dashboard generated: {DASHBOARD_OUT}")
+        print(f"[OK] Dashboard generated: {DASHBOARD_OUT}")
         return
 
     if args.settle:
         await check_settlements()
         generate_html(DASHBOARD_OUT)
-        print(f"✅ Dashboard updated: {DASHBOARD_OUT}")
+        print(f"[OK] Dashboard updated: {DASHBOARD_OUT}")
         return
 
     # Default: scan once (or loop)
@@ -226,12 +226,12 @@ async def main():
         await scan_and_log()
         await check_settlements()
         generate_html(DASHBOARD_OUT)
-        logger.info(f"📊 Dashboard updated: {DASHBOARD_OUT}")
+        logger.info(f"[DATA] Dashboard updated: {DASHBOARD_OUT}")
 
         if not args.loop:
             break
 
-        logger.info(f"💤 Sleeping {args.interval}s until next scan…")
+        logger.info(f"[SLEEP] Sleeping {args.interval}s until next scan…")
         await asyncio.sleep(args.interval)
 
 

@@ -96,7 +96,7 @@ def generate_html(output_path: str = None) -> str:
 </style>
 </head>
 <body>
-<h1>📊 Paper Trading Dashboard</h1>
+<h1>[DATA] Paper Trading Dashboard</h1>
 <p class="subtitle">Kalshi AI Trading Bot — Signal tracker &amp; hypothetical P&amp;L · Updated {now}</p>
 
 <div class="stats">

@@ -23,7 +23,7 @@ async def test_order_placement_flow():
     setup_logging()
     logger = logging.getLogger("order_placement_test")
     
-    logger.info("🎯 Testing REAL order placement functionality")
+    logger.info("[TARGET] Testing REAL order placement functionality")
     
     kalshi_client = KalshiClient()
     
@@ -31,10 +31,10 @@ async def test_order_placement_flow():
         # 1. Get account balance
         balance = await kalshi_client.get_balance()
         available = balance.get('balance', 0)
-        logger.info(f"💰 Available balance: ${available/100:.2f}")
+        logger.info(f"[MONEY] Available balance: ${available/100:.2f}")
         
         # 2. Find an active market with good liquidity
-        logger.info("🔍 Finding active market for testing...")
+        logger.info("[SEARCH] Finding active market for testing...")
         markets_response = await kalshi_client.get_markets(limit=100)
         markets = markets_response.get('markets', [])
         
@@ -48,26 +48,26 @@ async def test_order_placement_flow():
                 break
         
         if not test_market:
-            logger.error("❌ No suitable active market found for testing")
+            logger.error("[FAIL] No suitable active market found for testing")
             return False
         
         ticker = test_market['ticker']
         yes_ask = test_market['yes_ask']
         no_ask = test_market['no_ask']
         
-        logger.info(f"📈 Using market: {ticker}")
+        logger.info(f"[UP] Using market: {ticker}")
         logger.info(f"   Prices: YES={yes_ask}¢, NO={no_ask}¢")
         logger.info(f"   Volume: {test_market.get('volume', 0):,}")
         
         # 3. Get detailed orderbook
-        logger.info("📊 Getting orderbook data...")
+        logger.info("[DATA] Getting orderbook data...")
         orderbook = await kalshi_client.get_orderbook(ticker)
         
         yes_bids = orderbook.get('yes', [])
         no_bids = orderbook.get('no', [])
         
         if not yes_bids or not no_bids:
-            logger.error("❌ Market has no orderbook - cannot test")
+            logger.error("[FAIL] Market has no orderbook - cannot test")
             return False
         
         # 4. Place a conservative limit order (far from market)
@@ -76,7 +76,7 @@ async def test_order_placement_flow():
         safe_price = max(1, yes_ask - 10)  # Bid 10¢ below ask
         quantity = 1  # Just 1 contract for testing
         
-        logger.info(f"🚀 Placing LIMIT order: {quantity} {side.upper()} at {safe_price}¢")
+        logger.info(f"[START] Placing LIMIT order: {quantity} {side.upper()} at {safe_price}¢")
         
         client_order_id = str(uuid.uuid4())
         order_response = await kalshi_client.place_order(
@@ -91,11 +91,11 @@ async def test_order_placement_flow():
         )
         
         order_id = order_response.get('order', {}).get('order_id')
-        logger.info(f"✅ Order placed successfully! Order ID: {order_id}")
+        logger.info(f"[OK] Order placed successfully! Order ID: {order_id}")
         
         # 5. Verify order appears in our orders list
         await asyncio.sleep(1)
-        logger.info("🔍 Checking if order appears in orders list...")
+        logger.info("[SEARCH] Checking if order appears in orders list...")
         
         orders = await kalshi_client.get_orders()
         placed_order = None
@@ -105,19 +105,19 @@ async def test_order_placement_flow():
                 break
         
         if placed_order:
-            logger.info(f"✅ Order found in orders list: {placed_order.get('status')}")
+            logger.info(f"[OK] Order found in orders list: {placed_order.get('status')}")
         else:
-            logger.error("❌ Order not found in orders list!")
+            logger.error("[FAIL] Order not found in orders list!")
             return False
         
         # 6. Cancel the order
         logger.info(f"🗑️ Cancelling order {order_id}...")
         cancel_response = await kalshi_client.cancel_order(order_id)
-        logger.info(f"✅ Order cancelled: {cancel_response}")
+        logger.info(f"[OK] Order cancelled: {cancel_response}")
         
         # 7. Verify order was cancelled
         await asyncio.sleep(1)
-        logger.info("🔍 Verifying order cancellation...")
+        logger.info("[SEARCH] Verifying order cancellation...")
         
         updated_orders = await kalshi_client.get_orders()
         cancelled_order = None
@@ -129,17 +129,17 @@ async def test_order_placement_flow():
         if cancelled_order:
             status = cancelled_order.get('status')
             if status == 'canceled':
-                logger.info("✅ Order successfully cancelled")
+                logger.info("[OK] Order successfully cancelled")
                 return True
             else:
-                logger.warning(f"⚠️ Order status: {status} (may still be processing)")
+                logger.warning(f"[WARNING] Order status: {status} (may still be processing)")
                 return True
         else:
-            logger.info("✅ Order removed from orders list (cancelled)")
+            logger.info("[OK] Order removed from orders list (cancelled)")
             return True
         
     except Exception as e:
-        logger.error(f"❌ Order placement test failed: {e}")
+        logger.error(f"[FAIL] Order placement test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -151,7 +151,7 @@ async def test_database_sync():
     """Test that our database stays in sync with actual Kalshi positions."""
     
     logger = logging.getLogger("db_sync_test")
-    logger.info("🔄 Testing database synchronization with Kalshi portfolio")
+    logger.info("[CYCLE] Testing database synchronization with Kalshi portfolio")
     
     from src.utils.database import DatabaseManager
     
@@ -171,7 +171,7 @@ async def test_database_sync():
             cursor = await db.execute("SELECT market_id, quantity, side FROM positions WHERE live = 1")
             db_positions = await cursor.fetchall()
         
-        logger.info(f"📊 Kalshi positions: {len(kalshi_markets)} markets")
+        logger.info(f"[DATA] Kalshi positions: {len(kalshi_markets)} markets")
         logger.info(f"💾 Database positions: {len(db_positions)} positions")
         
         # Check for mismatches
@@ -181,18 +181,18 @@ async def test_database_sync():
             expected_pos = quantity if side == "YES" else -quantity
             
             if kalshi_pos != expected_pos:
-                logger.warning(f"⚠️ MISMATCH: {market_id} - DB: {expected_pos}, Kalshi: {kalshi_pos}")
+                logger.warning(f"[WARNING] MISMATCH: {market_id} - DB: {expected_pos}, Kalshi: {kalshi_pos}")
                 mismatches += 1
         
         if mismatches == 0:
-            logger.info("✅ Database and Kalshi positions are in sync")
+            logger.info("[OK] Database and Kalshi positions are in sync")
             return True
         else:
-            logger.error(f"❌ Found {mismatches} position mismatches")
+            logger.error(f"[FAIL] Found {mismatches} position mismatches")
             return False
         
     except Exception as e:
-        logger.error(f"❌ Database sync test failed: {e}")
+        logger.error(f"[FAIL] Database sync test failed: {e}")
         return False
     
     finally:

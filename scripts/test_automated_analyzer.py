@@ -9,26 +9,26 @@ from src.jobs.automated_performance_analyzer import AutomatedPerformanceAnalyzer
 async def test_automated_analyzer():
     """Test the new automated performance analyzer."""
     
-    print("🚀 TESTING AUTOMATED PERFORMANCE ANALYZER")
+    print("[START] TESTING AUTOMATED PERFORMANCE ANALYZER")
     print("=" * 60)
     
     try:
         # Run full analysis
         report = await run_performance_analysis()
         
-        print("✅ ANALYSIS COMPLETED SUCCESSFULLY")
+        print("[OK] ANALYSIS COMPLETED SUCCESSFULLY")
         print("=" * 60)
         
         # Display summary
         summary = report['summary']
-        print(f"📊 SYSTEM HEALTH SCORE: {summary['overall_health_score']:.1f}/100")
+        print(f"[DATA] SYSTEM HEALTH SCORE: {summary['overall_health_score']:.1f}/100")
         print(f"🔴 Critical Issues: {summary['total_critical_issues']}")
-        print(f"⚠️  Warnings: {summary['total_warnings']}")
-        print(f"🎯 Action Items: {len(report['action_items'])}")
+        print(f"[WARNING]  Warnings: {summary['total_warnings']}")
+        print(f"[TARGET] Action Items: {len(report['action_items'])}")
         
         # Show performance metrics
         metrics = report['performance_metrics']
-        print(f"\n📈 PERFORMANCE OVERVIEW:")
+        print(f"\n[UP] PERFORMANCE OVERVIEW:")
         print(f"   Total Trades: {metrics['total_trades']}")
         print(f"   Manual Trades: {metrics['manual_trades']} (Win Rate: {metrics['manual_win_rate']:.1%})")
         print(f"   Automated Trades: {metrics['automated_trades']} (Win Rate: {metrics['automated_win_rate']:.1%})")
@@ -46,14 +46,14 @@ async def test_automated_analyzer():
         
         warning_checks = [check for check in report['risk_checks'] if check['status'] == 'WARNING']
         if warning_checks:
-            print(f"\n⚠️  WARNING ISSUES:")
+            print(f"\n[WARNING]  WARNING ISSUES:")
             for check in warning_checks:
                 print(f"   - {check['check_name']}: {check['recommendation']}")
         
         # Show critical action items
         critical_actions = [action for action in report['action_items'] if action['priority'] == 'CRITICAL']
         if critical_actions:
-            print(f"\n🚨 CRITICAL ACTIONS REQUIRED:")
+            print(f"\n[ALERT] CRITICAL ACTIONS REQUIRED:")
             for action in critical_actions:
                 print(f"   - {action['action']}")
                 print(f"     Rationale: {action['rationale']}")
@@ -74,9 +74,9 @@ async def test_automated_analyzer():
             analysis_text = report['grok_analysis']['analysis_text']
             # Show first 500 characters
             print(analysis_text[:500] + "..." if len(analysis_text) > 500 else analysis_text)
-            print(f"\n💰 Grok4 Analysis Cost: ${report['grok_analysis']['cost']:.4f}")
+            print(f"\n[MONEY] Grok4 Analysis Cost: ${report['grok_analysis']['cost']:.4f}")
         else:
-            print(f"\n⚠️  Grok4 analysis unavailable, using fallback analysis")
+            print(f"\n[WARNING]  Grok4 analysis unavailable, using fallback analysis")
         
         # Show total counts for each priority
         priority_counts = {}
@@ -94,7 +94,7 @@ async def test_automated_analyzer():
         return report
         
     except Exception as e:
-        print(f"❌ Test failed: {e}")
+        print(f"[FAIL] Test failed: {e}")
         import traceback
         traceback.print_exc()
         return None

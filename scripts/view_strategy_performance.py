@@ -24,7 +24,7 @@ async def view_strategy_performance():
     
     setup_logging()
     
-    print("📊 STRATEGY PERFORMANCE ANALYSIS")
+    print("[DATA] STRATEGY PERFORMANCE ANALYSIS")
     print("=" * 60)
     
     # Initialize database
@@ -46,7 +46,7 @@ async def view_strategy_performance():
         total_open = sum(stats['open_positions'] for stats in performance.values())
         total_deployed = sum(stats['capital_deployed'] for stats in performance.values())
         
-        print(f"📈 OVERALL PERFORMANCE:")
+        print(f"[UP] OVERALL PERFORMANCE:")
         print(f"   Total Completed Trades: {total_trades}")
         print(f"   Total P&L: ${total_pnl:.2f}")
         print(f"   Open Positions: {total_open}")
@@ -54,7 +54,7 @@ async def view_strategy_performance():
         print()
         
         # Display per-strategy breakdown
-        print("🎯 PERFORMANCE BY STRATEGY:")
+        print("[TARGET] PERFORMANCE BY STRATEGY:")
         print("-" * 60)
         
         # Sort strategies by total P&L (best first)
@@ -94,16 +94,16 @@ async def view_strategy_performance():
                 default=(None, None)
             )
             
-            print("💡 INSIGHTS:")
+            print("[IDEA] INSIGHTS:")
             print(f"   🏆 Best P&L: {best_strategy[0]} (${best_strategy[1]['total_pnl']:.2f})")
             
             if best_win_rate[0]:
-                print(f"   🎯 Best Win Rate: {best_win_rate[0]} ({best_win_rate[1]['win_rate_pct']:.1f}%)")
+                print(f"   [TARGET] Best Win Rate: {best_win_rate[0]} ({best_win_rate[1]['win_rate_pct']:.1f}%)")
             
-            print(f"   💰 Average Trade: ${total_pnl/total_trades:.2f}")
+            print(f"   [MONEY] Average Trade: ${total_pnl/total_trades:.2f}")
         
     except Exception as e:
-        print(f"❌ Error retrieving strategy performance: {e}")
+        print(f"[FAIL] Error retrieving strategy performance: {e}")
         import traceback
         traceback.print_exc()
     
@@ -157,7 +157,7 @@ async def view_recent_positions_by_strategy():
         
         # Display each strategy's recent positions
         for strategy, pos_list in by_strategy.items():
-            print(f"\n🎯 {strategy.upper().replace('_', ' ')} ({len(pos_list)} positions)")
+            print(f"\n[TARGET] {strategy.upper().replace('_', ' ')} ({len(pos_list)} positions)")
             print("-" * 40)
             
             for pos in pos_list[:5]:  # Show top 5 recent
@@ -168,7 +168,7 @@ async def view_recent_positions_by_strategy():
                 print(f"   ... and {len(pos_list) - 5} more positions")
     
     except Exception as e:
-        print(f"❌ Error retrieving recent positions: {e}")
+        print(f"[FAIL] Error retrieving recent positions: {e}")
     
     finally:
         await db_manager.close()

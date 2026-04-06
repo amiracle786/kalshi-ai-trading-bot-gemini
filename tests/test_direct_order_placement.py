@@ -26,7 +26,7 @@ async def test_direct_order_placement():
     setup_logging()
     logger = logging.getLogger("direct_order_test")
     
-    logger.info("🎯 Testing DIRECT real order placement (no AI, no simulation)")
+    logger.info("[TARGET] Testing DIRECT real order placement (no AI, no simulation)")
     
     kalshi_client = KalshiClient()
     db_manager = DatabaseManager()
@@ -35,7 +35,7 @@ async def test_direct_order_placement():
         await db_manager.initialize()
         
         # 1. Find a tradeable market
-        logger.info("🔍 Finding tradeable markets...")
+        logger.info("[SEARCH] Finding tradeable markets...")
         markets_response = await kalshi_client.get_markets(limit=200, status="open")
         markets = markets_response.get('markets', [])
         
@@ -52,7 +52,7 @@ async def test_direct_order_placement():
                 tradeable_markets.append(market)
         
         if not tradeable_markets:
-            logger.error("❌ No tradeable markets found")
+            logger.error("[FAIL] No tradeable markets found")
             return False
         
         # Use highest volume market
@@ -62,14 +62,14 @@ async def test_direct_order_placement():
         no_ask = test_market['no_ask']
         volume = test_market['volume']
         
-        logger.info(f"📈 Using highest volume market: {ticker}")
+        logger.info(f"[UP] Using highest volume market: {ticker}")
         logger.info(f"   Volume: {volume:,} contracts")
         logger.info(f"   Prices: YES={yes_ask}¢, NO={no_ask}¢")
         
         # 2. Check current account balance
         balance = await kalshi_client.get_balance()
         available = balance.get('balance', 0)
-        logger.info(f"💰 Available balance: ${available/100:.2f}")
+        logger.info(f"[MONEY] Available balance: ${available/100:.2f}")
         
         # 3. Check initial positions
         initial_positions = await kalshi_client.get_positions()
@@ -79,7 +79,7 @@ async def test_direct_order_placement():
                 initial_position = pos.get('position', 0)
                 break
         
-        logger.info(f"📊 Initial position in {ticker}: {initial_position} contracts")
+        logger.info(f"[DATA] Initial position in {ticker}: {initial_position} contracts")
         
         # 4. Create a small test position (choose the cheaper side)
         if yes_ask <= no_ask:
@@ -93,10 +93,10 @@ async def test_direct_order_placement():
         cost_cents = price_cents * quantity
         cost_dollars = cost_cents / 100
         
-        logger.info(f"💰 Test order: {quantity} {side} contract at {price_cents}¢ = ${cost_dollars:.2f}")
+        logger.info(f"[MONEY] Test order: {quantity} {side} contract at {price_cents}¢ = ${cost_dollars:.2f}")
         
         if cost_cents > available:
-            logger.error(f"❌ Insufficient funds: Need {cost_cents}¢, have {available}¢")
+            logger.error(f"[FAIL] Insufficient funds: Need {cost_cents}¢, have {available}¢")
             return False
         
         # 5. Create Position object
@@ -114,14 +114,14 @@ async def test_direct_order_placement():
         # 6. Add to database
         position_id = await db_manager.add_position(position)
         if position_id is None:
-            logger.error(f"❌ Position already exists for {ticker}")
+            logger.error(f"[FAIL] Position already exists for {ticker}")
             return False
         
         position.id = position_id
-        logger.info(f"✅ Position added to database with ID: {position_id}")
+        logger.info(f"[OK] Position added to database with ID: {position_id}")
         
         # 7. Execute the REAL order
-        logger.info(f"🚀 Placing REAL order on Kalshi...")
+        logger.info(f"[START] Placing REAL order on Kalshi...")
         success = await execute_position(
             position=position,
             live_mode=True,  # FORCE live mode - NO simulation
@@ -130,15 +130,15 @@ async def test_direct_order_placement():
         )
         
         if not success:
-            logger.error("❌ Order execution failed!")
+            logger.error("[FAIL] Order execution failed!")
             return False
         
-        logger.info("✅ Order execution returned success!")
+        logger.info("[OK] Order execution returned success!")
         
         # 8. Wait and check if position appeared
         await asyncio.sleep(3)
         
-        logger.info("🔍 Checking if order was actually filled...")
+        logger.info("[SEARCH] Checking if order was actually filled...")
         final_positions = await kalshi_client.get_positions()
         final_position = 0
         for pos in final_positions.get('market_positions', []):
@@ -158,7 +158,7 @@ async def test_direct_order_placement():
                 db_live, db_status = result
                 logger.info(f"💾 Database position: live={db_live}, status={db_status}")
             else:
-                logger.error("❌ Position not found in database!")
+                logger.error("[FAIL] Position not found in database!")
                 return False
         
         # 10. Verify the order was actually placed
@@ -167,16 +167,16 @@ async def test_direct_order_placement():
         if position_change != 0:
             logger.info(f"🎉 SUCCESS! Position changed by {position_change} contracts")
             logger.info(f"   Before: {initial_position}, After: {final_position}")
-            logger.info(f"✅ REAL ORDER WAS PLACED AND FILLED!")
+            logger.info(f"[OK] REAL ORDER WAS PLACED AND FILLED!")
             return True
         else:
-            logger.error(f"❌ NO position change detected!")
+            logger.error(f"[FAIL] NO position change detected!")
             logger.error(f"   Database shows success but Kalshi position unchanged")
             logger.error(f"   This suggests order was not actually placed")
             return False
         
     except Exception as e:
-        logger.error(f"❌ Test failed: {e}")
+        logger.error(f"[FAIL] Test failed: {e}")
         import traceback
         traceback.print_exc()
         return False

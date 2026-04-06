@@ -284,7 +284,7 @@ class SafeCompounder:
         portfolio = bal.get("portfolio_value", 0)
         cash = bal.get("balance", 0)
 
-        print(f"\n💰 Cash: ${cash/100:.2f} | Portfolio: ${portfolio/100:.2f} | "
+        print(f"\n[MONEY] Cash: ${cash/100:.2f} | Portfolio: ${portfolio/100:.2f} | "
               f"Total: ${(cash+portfolio)/100:.2f}\n", flush=True)
 
         # Step 0: Cancel legacy YES orders
@@ -297,11 +297,11 @@ class SafeCompounder:
         print(f"  Fetched {len(markets)} markets", flush=True)
 
         # Step 2: Filter NO candidates
-        print("\n🔍 Step 2: Finding NO-side candidates (YES ≤ $0.20)...", flush=True)
+        print("\n[SEARCH] Step 2: Finding NO-side candidates (YES ≤ $0.20)...", flush=True)
         candidates = self._find_no_candidates(markets)
 
         # Step 3: Orderbook + edge check
-        print(f"\n📊 Step 3: Checking orderbooks for edge ≥ ${self.min_edge:.2f}...", flush=True)
+        print(f"\n[DATA] Step 3: Checking orderbooks for edge ≥ ${self.min_edge:.2f}...", flush=True)
         opportunities = await self._check_orderbook_and_price(candidates)
 
         # Display top opportunities
@@ -321,14 +321,14 @@ class SafeCompounder:
             print(f"    {opp['title']}", flush=True)
 
         # Step 4: Place orders
-        print(f"\n🚀 Step 4: Placing maker orders (ask - $0.01)...", flush=True)
+        print(f"\n[START] Step 4: Placing maker orders (ask - $0.01)...", flush=True)
         stats = await self._place_resting_orders(sorted_opps, portfolio, cash)
 
         elapsed = time.time() - start
         bal = await self.client.get_balance()
 
         print(f"\n{'='*70}", flush=True)
-        print(f"📊 SAFE COMPOUNDER REPORT", flush=True)
+        print(f"[DATA] SAFE COMPOUNDER REPORT", flush=True)
         print(f"{'='*70}", flush=True)
         print(f"  Markets scanned:      {len(markets)}", flush=True)
         print(f"  NO candidates:        {len(candidates)}", flush=True)
@@ -623,13 +623,13 @@ class SafeCompounder:
                 if filled > 0:
                     stats["filled"] += filled
                     print(
-                        f"  🎯 FILLED NO x{filled}/{contracts} @ ${price:.2f} | "
+                        f"  [TARGET] FILLED NO x{filled}/{contracts} @ ${price:.2f} | "
                         f"edge:${opp['edge']:.2f} +${filled * opp['profit']/100:.2f} | {ticker}",
                         flush=True,
                     )
                 else:
                     print(
-                        f"  ✅ NO x{contracts} @ ${price:.2f} | {status} | "
+                        f"  [OK] NO x{contracts} @ ${price:.2f} | {status} | "
                         f"edge:${opp['edge']:.2f} {opp['roi_pct']:.1f}% | {ticker}",
                         flush=True,
                     )
@@ -641,7 +641,7 @@ class SafeCompounder:
                 await asyncio.sleep(0.2)
 
             except Exception as e:
-                print(f"  ❌ {ticker}: {e}", flush=True)
+                print(f"  [FAIL] {ticker}: {e}", flush=True)
                 stats["errors"] += 1
                 await asyncio.sleep(0.3)
 
@@ -708,7 +708,7 @@ class SafeCompounder:
         portfolio = bal.get("portfolio_value", 0)
         cash = bal.get("balance", 0)
         print(
-            f"💰 Cash: ${cash/100:.2f} | Portfolio: ${portfolio/100:.2f} | "
+            f"[MONEY] Cash: ${cash/100:.2f} | Portfolio: ${portfolio/100:.2f} | "
             f"Total: ${(cash+portfolio)/100:.2f}",
             flush=True,
         )
@@ -728,7 +728,7 @@ class SafeCompounder:
         try:
             fills_resp = await self.client.get_fills(limit=20)
             fill_list = fills_resp.get("fills", [])
-            print(f"\n📊 Last 20 fills:", flush=True)
+            print(f"\n[DATA] Last 20 fills:", flush=True)
             for f in fill_list:
                 ticker = f.get("ticker", "")
                 side = f.get("side", "")

@@ -32,7 +32,7 @@ from src.clients.kalshi_client import KalshiClient
 # Configure Streamlit page
 st.set_page_config(
     page_title="Trading System Dashboard",
-    page_icon="📊",
+    page_icon="[DATA]",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -269,28 +269,28 @@ def load_system_health():
 def main():
     """Main dashboard function."""
     
-    st.title("🚀 Trading System Dashboard")
+    st.title("[START] Trading System Dashboard")
     st.markdown("**Real-time monitoring and analysis of your automated trading system**")
     
     # Add refresh button to clear cache
     col1, col2 = st.columns([4, 1])
     with col2:
-        if st.button("🔄 Refresh Data", help="Clear cache and reload all data"):
+        if st.button("[CYCLE] Refresh Data", help="Clear cache and reload all data"):
             st.cache_data.clear()
             st.rerun()
     
     # Sidebar for navigation
-    st.sidebar.title("📊 Dashboard")
+    st.sidebar.title("[DATA] Dashboard")
     
     page = st.sidebar.selectbox(
         "Select View",
         [
-            "📈 Overview",
-            "🎯 Strategy Performance", 
+            "[UP] Overview",
+            "[TARGET] Strategy Performance", 
             "🤖 LLM Analysis",
             "💼 Positions & Trades",
-            "⚠️ Risk Management",
-            "🔧 System Health"
+            "[WARNING] Risk Management",
+            "[TOOL] System Health"
         ]
     )
     
@@ -306,36 +306,36 @@ def main():
     
     # Show data status in sidebar
     st.sidebar.markdown("---")
-    st.sidebar.markdown("**📊 Data Status:**")
+    st.sidebar.markdown("**[DATA] Data Status:**")
     st.sidebar.metric("Active Positions", len(positions) if positions else 0)
     st.sidebar.metric("LLM Queries (24h)", len(llm_queries) if llm_queries else 0)
     st.sidebar.metric("Portfolio Balance", f"${system_health_data.get('total_portfolio_value', 0):.2f}")
     
     # Page routing
-    if page == "📈 Overview":
+    if page == "[UP] Overview":
         show_overview(performance_data, positions, system_health_data)
-    elif page == "🎯 Strategy Performance":
+    elif page == "[TARGET] Strategy Performance":
         show_strategy_performance(performance_data)
     elif page == "🤖 LLM Analysis":
         show_llm_analysis(llm_queries, llm_stats)
     elif page == "💼 Positions & Trades":
         show_positions_trades(positions)
-    elif page == "⚠️ Risk Management":
+    elif page == "[WARNING] Risk Management":
         show_risk_management(performance_data, positions, system_health_data['total_portfolio_value'])
-    elif page == "🔧 System Health":
+    elif page == "[TOOL] System Health":
         show_system_health(system_health_data['available_cash'], system_health_data['positions_count'], llm_stats)
 
 def show_overview(performance_data, positions, system_health_data):
     """Show overview dashboard."""
     
-    st.header("📈 System Overview")
+    st.header("[UP] System Overview")
     
     # Key metrics row
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.metric(
-            label="💰 Portfolio Balance",
+            label="[MONEY] Portfolio Balance",
             value=f"${system_health_data['total_portfolio_value']:.2f}",
             help="Total portfolio value: cash + current positions"
         )
@@ -352,7 +352,7 @@ def show_overview(performance_data, positions, system_health_data):
     
     with col2b:
         st.metric(
-            label="📊 Position Value",
+            label="[DATA] Position Value",
             value=f"${system_health_data['position_value']:.2f}",
             help="Current market value of all positions"
         )
@@ -360,7 +360,7 @@ def show_overview(performance_data, positions, system_health_data):
     with col2:
         total_trades = sum(stats.get('completed_trades', 0) for stats in performance_data.values()) if performance_data else 0
         st.metric(
-            label="📈 Total Trades",
+            label="[UP] Total Trades",
             value=total_trades,
             help="Total completed trades across all strategies"
         )
@@ -393,7 +393,7 @@ def show_overview(performance_data, positions, system_health_data):
     
     with col4:
         st.metric(
-            label="🎯 Active Positions",
+            label="[TARGET] Active Positions",
             value=len(positions) if positions else 0,
             help="Currently open positions"
         )
@@ -405,7 +405,7 @@ def show_overview(performance_data, positions, system_health_data):
         else:
             utilization_pct = 0
         st.metric(
-            label="📊 Portfolio Utilization",
+            label="[DATA] Portfolio Utilization",
             value=f"{utilization_pct:.1f}%",
             help="Percentage of portfolio currently in positions"
         )
@@ -425,7 +425,7 @@ def show_overview(performance_data, positions, system_health_data):
     
     # Strategy performance summary
     if performance_data:
-        st.subheader("🎯 Strategy Performance Summary")
+        st.subheader("[TARGET] Strategy Performance Summary")
         
         # Create strategy performance chart
         strategy_names = []
@@ -467,7 +467,7 @@ def show_overview(performance_data, positions, system_health_data):
             fig_winrate.update_layout(showlegend=False, height=400)
             st.plotly_chart(fig_winrate, use_container_width=True)
     else:
-        st.info("📊 **No strategy data yet** - Run the trading system to start collecting performance data")
+        st.info("[DATA] **No strategy data yet** - Run the trading system to start collecting performance data")
     
     # Recent activity summary
     st.subheader("📋 Recent Activity")
@@ -504,7 +504,7 @@ def show_overview(performance_data, positions, system_health_data):
 def show_strategy_performance(performance_data):
     """Show detailed strategy performance analysis."""
     
-    st.header("🎯 Strategy Performance Analysis")
+    st.header("[TARGET] Strategy Performance Analysis")
     
     if not performance_data:
         st.warning("No strategy performance data available yet.")
@@ -519,7 +519,7 @@ def show_strategy_performance(performance_data):
     
     if selected_strategy == "All Strategies":
         # Compare all strategies
-        st.subheader("📊 Strategy Comparison")
+        st.subheader("[DATA] Strategy Comparison")
         
         # Create comparison table
         comparison_data = []
@@ -601,7 +601,7 @@ def show_strategy_performance(performance_data):
         
         # Detailed metrics
         if stats['completed_trades'] > 0:
-            st.subheader("📈 Detailed Metrics")
+            st.subheader("[UP] Detailed Metrics")
             
             col1, col2 = st.columns(2)
             
@@ -629,12 +629,12 @@ def show_llm_analysis(llm_queries, llm_stats):
     
     if not llm_queries and not llm_stats:
         st.warning("No LLM query data available yet. LLM logging will start with new queries.")
-        st.info("💡 **Tip:** The system will automatically log all future Grok queries for analysis.")
+        st.info("[IDEA] **Tip:** The system will automatically log all future Grok queries for analysis.")
         return
     
     # LLM usage stats
     if llm_stats:
-        st.subheader("📊 LLM Usage Statistics (Last 7 Days)")
+        st.subheader("[DATA] LLM Usage Statistics (Last 7 Days)")
         
         # Create stats summary
         total_queries = sum(stats['query_count'] for stats in llm_stats.values())
@@ -676,7 +676,7 @@ def show_llm_analysis(llm_queries, llm_stats):
             st.plotly_chart(fig_usage, use_container_width=True)
     
     # Query filters
-    st.subheader("🔍 Query Analysis")
+    st.subheader("[SEARCH] Query Analysis")
     
     col1, col2, col3 = st.columns(3)
     
@@ -767,7 +767,7 @@ def show_positions_trades(positions):
         return
     
     # Positions overview
-    st.subheader(f"📊 Active Positions ({len(positions)})")
+    st.subheader(f"[DATA] Active Positions ({len(positions)})")
     
     # Create positions DataFrame
     position_data = []
@@ -824,7 +824,7 @@ def show_positions_trades(positions):
     
     # Position analytics
     if not filtered_df.empty:
-        st.subheader("📈 Position Analytics")
+        st.subheader("[UP] Position Analytics")
         
         col1, col2 = st.columns(2)
         
@@ -856,7 +856,7 @@ def show_positions_trades(positions):
 def show_risk_management(performance_data, positions, system_balance):
     """Show risk management dashboard."""
     
-    st.header("⚠️ Risk Management")
+    st.header("[WARNING] Risk Management")
     
     # Handle empty positions gracefully
     if not positions:
@@ -872,8 +872,8 @@ def show_risk_management(performance_data, positions, system_balance):
         with col4:
             st.metric("Max Single Position", "0.0%")
         
-        st.subheader("🚨 Risk Alerts")
-        st.success("✅ All risk metrics within acceptable ranges")
+        st.subheader("[ALERT] Risk Alerts")
+        st.success("[OK] All risk metrics within acceptable ranges")
         return
     
     # Calculate risk metrics from live positions
@@ -917,18 +917,18 @@ def show_risk_management(performance_data, positions, system_balance):
             )
         
         # Risk alerts
-        st.subheader("🚨 Risk Alerts")
+        st.subheader("[ALERT] Risk Alerts")
         
         alerts = []
         
         if portfolio_utilization > 90:
-            alerts.append("⚠️ **High Portfolio Utilization**: Over 90% of capital deployed")
+            alerts.append("[WARNING] **High Portfolio Utilization**: Over 90% of capital deployed")
         
         if max_risk_pct > 20:
-            alerts.append("⚠️ **Large Position Risk**: Single position exceeds 20% of portfolio")
+            alerts.append("[WARNING] **Large Position Risk**: Single position exceeds 20% of portfolio")
         
         if len(positions) > 50:
-            alerts.append("⚠️ **High Position Count**: Over 50 active positions may be difficult to manage")
+            alerts.append("[WARNING] **High Position Count**: Over 50 active positions may be difficult to manage")
         
         # Check for positions without stop losses (if supported)
         no_stop_loss = []
@@ -937,18 +937,18 @@ def show_risk_management(performance_data, positions, system_balance):
                 no_stop_loss.append(pos)
         
         if no_stop_loss:
-            alerts.append(f"⚠️ **No Stop Losses**: {len(no_stop_loss)} positions lack stop loss protection")
+            alerts.append(f"[WARNING] **No Stop Losses**: {len(no_stop_loss)} positions lack stop loss protection")
         
         if alerts:
             for alert in alerts:
                 st.warning(alert)
         else:
-            st.success("✅ All risk metrics within acceptable ranges")
+            st.success("[OK] All risk metrics within acceptable ranges")
         
         # Risk by strategy breakdown
         strategy_names = [pos['strategy'] for pos in positions if 'strategy' in pos]
         if len(set(strategy_names)) > 1:
-            st.subheader("📊 Risk by Strategy")
+            st.subheader("[DATA] Risk by Strategy")
             
             strategy_risk = {}
             for pos in positions:
@@ -989,7 +989,7 @@ def show_risk_management(performance_data, positions, system_balance):
 def show_system_health(available_cash, positions_count, llm_stats):
     """Show system health and monitoring."""
     
-    st.header("🔧 System Health")
+    st.header("[TOOL] System Health")
     
     # System status
     st.subheader("🟢 System Status")
@@ -997,20 +997,20 @@ def show_system_health(available_cash, positions_count, llm_stats):
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.success("✅ **Kalshi Connection**: Active")
+        st.success("[OK] **Kalshi Connection**: Active")
         st.write(f"Available Cash: ${available_cash:.2f}")
         st.write(f"Positions: {positions_count}")
     
     with col2:
         if llm_stats:
-            st.success("✅ **LLM Integration**: Active")
+            st.success("[OK] **LLM Integration**: Active")
             total_queries = sum(stats['query_count'] for stats in llm_stats.values())
             st.write(f"Queries (7d): {total_queries}")
         else:
-            st.warning("⚠️ **LLM Logging**: No data")
+            st.warning("[WARNING] **LLM Logging**: No data")
     
     with col3:
-        st.success("✅ **Database**: Connected")
+        st.success("[OK] **Database**: Connected")
         st.write("All tables operational")
     
     # Recent activity timeline
@@ -1033,7 +1033,7 @@ def show_system_health(available_cash, positions_count, llm_stats):
                 st.write(f"- **{strategy}**: Last query {time_str}")
     
     # Configuration summary
-    st.subheader("⚙️ Configuration")
+    st.subheader("[CONFIG] Configuration")
     
     config_info = {
         "Database Path": "trading_system.db",
@@ -1047,25 +1047,25 @@ def show_system_health(available_cash, positions_count, llm_stats):
         st.write(f"**{key}:** {value}")
     
     # System recommendations
-    st.subheader("💡 Recommendations")
+    st.subheader("[IDEA] Recommendations")
     
     recommendations = []
     
     if available_cash < 100:
-        recommendations.append("💰 Consider increasing account balance for more trading opportunities")
+        recommendations.append("[MONEY] Consider increasing account balance for more trading opportunities")
     
     if not llm_stats:
         recommendations.append("🤖 LLM query logging will begin with next trading cycle")
     
     total_queries = sum(stats['query_count'] for stats in llm_stats.values()) if llm_stats else 0
     if total_queries > 1000:
-        recommendations.append("📊 High LLM usage - consider optimizing query frequency")
+        recommendations.append("[DATA] High LLM usage - consider optimizing query frequency")
     
     if recommendations:
         for rec in recommendations:
             st.info(rec)
     else:
-        st.success("✅ System running optimally - no recommendations at this time")
+        st.success("[OK] System running optimally - no recommendations at this time")
 
 if __name__ == "__main__":
     main() 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Beast Mode Trading Bot 🚀
+Beast Mode Trading Bot [START]
 
 Main entry point for the Unified Advanced Trading System that orchestrates:
 - Market Making Strategy (40% allocation)
@@ -22,6 +22,7 @@ Usage:
 
 import asyncio
 import argparse
+import os
 import time
 import signal
 from datetime import datetime, timedelta
@@ -45,7 +46,7 @@ from beast_mode_dashboard import BeastModeDashboard
 
 class BeastModeBot:
     """
-    Beast Mode Trading Bot - Advanced Multi-Strategy Trading System 🚀
+    Beast Mode Trading Bot - Advanced Multi-Strategy Trading System [START]
     
     This bot orchestrates all advanced strategies:
     1. Market Making (spread profits)
@@ -71,49 +72,60 @@ class BeastModeBot:
         
         # Add detailed logging for debugging
         self.logger.info(
-            f"🚀 Beast Mode Bot initialized - "
+            f"[STARTUP] Beast Mode Bot initialized - "
             f"Mode: {'LIVE TRADING' if live_mode else 'PAPER TRADING'}"
         )
-        self.logger.info(f"📊 CLI live_mode parameter: {live_mode}")
-        self.logger.info(f"⚙️ settings.trading.live_trading_enabled: {settings.trading.live_trading_enabled}")
-        self.logger.info(f"⚙️ settings.trading.paper_trading_mode: {settings.trading.paper_trading_mode}")
+        self.logger.info(f"[CONFIG] CLI live_mode parameter: {live_mode}")
+        self.logger.info(f"[CONFIG] settings.trading.live_trading_enabled: {settings.trading.live_trading_enabled}")
+        self.logger.info(f"[CONFIG] settings.trading.paper_trading_mode: {settings.trading.paper_trading_mode}")
         
         if live_mode:
-            self.logger.warning("⚠️ LIVE TRADING MODE ENABLED - REAL MONEY WILL BE USED")
-            self.logger.warning("⚠️ All orders will be placed on the Kalshi exchange")
+            self.logger.warning("[WARNING] LIVE TRADING MODE ENABLED - REAL MONEY WILL BE USED")
+            self.logger.warning("[WARNING] All orders will be placed on the Kalshi exchange")
         else:
-            self.logger.info("📝 Paper trading mode - orders will be simulated")
+            self.logger.info("[INFO] Paper trading mode - orders will be simulated")
 
     async def run_dashboard_mode(self):
         """Run in live dashboard mode with real-time updates."""
         try:
-            self.logger.info("🚀 Starting Beast Mode Dashboard Mode")
+            self.logger.info("[DASHBOARD] Starting Beast Mode Dashboard Mode")
             dashboard = BeastModeDashboard()
             await dashboard.show_live_dashboard()
         except KeyboardInterrupt:
-            self.logger.info("👋 Dashboard mode stopped")
+            self.logger.info("[SHUTDOWN] Dashboard mode stopped")
         except Exception as e:
             self.logger.error(f"Error in dashboard mode: {e}")
 
     async def run_trading_mode(self):
         """Run the Beast Mode trading system with all strategies."""
         try:
-            self.logger.info("🚀 BEAST MODE TRADING BOT STARTED")
-            self.logger.info(f"📊 Trading Mode: {'LIVE' if self.live_mode else 'PAPER'}")
-            self.logger.info(f"💰 Daily AI Budget: ${settings.trading.daily_ai_budget}")
-            self.logger.info(f"⚡ Features: Market Making + Portfolio Optimization + Dynamic Exits")
+            self.logger.info("[STARTUP] BEAST MODE TRADING BOT STARTED")
+            self.logger.info(f"[CONFIG] Trading Mode: {'LIVE' if self.live_mode else 'PAPER'}")
+            self.logger.info(f"[CONFIG] Daily AI Budget: ${settings.trading.daily_ai_budget}")
+            self.logger.info(f"[CONFIG] Features: Market Making + Portfolio Optimization + Dynamic Exits")
             
-            # 🚨 CRITICAL FIX: Initialize database FIRST and wait for completion
-            self.logger.info("🔧 Initializing database...")
+            # CRITICAL FIX: Initialize database FIRST and wait for completion
+            self.logger.info("[INIT] Initializing database...")
             db_manager = DatabaseManager()
             await self._ensure_database_ready(db_manager)
-            self.logger.info("✅ Database initialization complete!")
+            self.logger.info("[INIT] Database initialization complete!")
             
             # Initialize other components
             kalshi_client = KalshiClient()
-            xai_client = XAIClient(db_manager=db_manager)  # Pass db_manager for LLM logging
+
+            # Initialize xAI client if API key is available, otherwise None
+            xai_client = None
+            try:
+                if os.getenv("XAI_API_KEY"):
+                    xai_client = XAIClient(db_manager=db_manager)  # Pass db_manager for LLM logging
+                    self.logger.info("XAI client initialized")
+                else:
+                    self.logger.info("XAI_API_KEY not set - using OpenRouter only")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize XAI client: {e} - using OpenRouter only")
 
             # Initialize multi-model router (wraps xAI + OpenRouter)
+            # xai_client can be None - router will use OpenRouter fallback
             self.model_router = ModelRouter(xai_client=xai_client, db_manager=db_manager)
             self.logger.info(
                 "ModelRouter initialized for multi-model ensemble",
@@ -122,16 +134,16 @@ class BeastModeBot:
             
             # Small delay to ensure everything is ready
             await asyncio.sleep(1)
-            
+
             # Start market ingestion first
-            self.logger.info("🔄 Starting market ingestion...")
+            self.logger.info("[TASKS] Starting market ingestion...")
             ingestion_task = asyncio.create_task(self._run_market_ingestion(db_manager, kalshi_client))
-            
+
             # Wait for initial market data ingestion
             await asyncio.sleep(10)
-            
+
             # Run remaining background tasks
-            self.logger.info("🚀 Starting trading and monitoring tasks...")
+            self.logger.info("[TASKS] Starting trading and monitoring tasks...")
             tasks = [
                 ingestion_task,  # Already started
                 asyncio.create_task(self._run_trading_cycles(db_manager, kalshi_client, xai_client)),
@@ -141,7 +153,7 @@ class BeastModeBot:
             
             # Setup shutdown handler
             def signal_handler():
-                self.logger.info("🛑 Shutdown signal received")
+                self.logger.info("[SHUTDOWN] Shutdown signal received")
                 self.shutdown_event.set()
                 for task in tasks:
                     task.cancel()
@@ -155,8 +167,8 @@ class BeastModeBot:
             
             await self.model_router.close()
             await kalshi_client.close()
-            
-            self.logger.info("🏁 Beast Mode Bot shut down gracefully")
+
+            self.logger.info("[SHUTDOWN] Beast Mode Bot shut down gracefully")
             
         except Exception as e:
             self.logger.error(f"Error in Beast Mode Bot: {e}")
@@ -175,7 +187,7 @@ class BeastModeBot:
                 await db.execute("SELECT COUNT(*) FROM markets LIMIT 1") 
                 await db.execute("SELECT COUNT(*) FROM trade_logs LIMIT 1")
             
-            self.logger.info("🎯 Database tables verified and ready")
+            self.logger.info("[INIT] Database tables verified and ready")
         except Exception as e:
             self.logger.error(f"Database initialization failed: {e}")
             raise
@@ -186,7 +198,7 @@ class BeastModeBot:
             try:
                 # Create a queue for market ingestion (though we're not using it in Beast Mode)
                 market_queue = asyncio.Queue()
-                # ✅ FIXED: Pass the shared database manager
+                # [OK] FIXED: Pass the shared database manager
                 await run_ingestion(db_manager, market_queue)
                 await asyncio.sleep(300)  # Run every 5 minutes (much slower to prevent 429s)
             except Exception as e:
@@ -206,20 +218,20 @@ class BeastModeBot:
                     continue
                 
                 cycle_count += 1
-                self.logger.info(f"🔄 Starting Beast Mode Trading Cycle #{cycle_count}")
-                
+                self.logger.info(f"[CYCLE] Starting Beast Mode Trading Cycle #{cycle_count}")
+
                 # Run the Beast Mode unified trading system
                 results = await run_trading_job()
-                
+
                 if results and results.total_positions > 0:
                     self.logger.info(
-                        f"✅ Cycle #{cycle_count} Complete - "
+                        f"[CYCLE] Cycle #{cycle_count} Complete - "
                         f"Positions: {results.total_positions}, "
                         f"Capital Used: ${results.total_capital_used:.0f} ({results.capital_efficiency:.1%}), "
                         f"Expected Return: {results.expected_annual_return:.1%}"
                     )
                 else:
-                    self.logger.info(f"📊 Cycle #{cycle_count} Complete - No new positions created")
+                    self.logger.info(f"[CYCLE] Cycle #{cycle_count} Complete - No new positions created")
                 
                 # Wait for next cycle (60 seconds)
                 await asyncio.sleep(60)
@@ -228,20 +240,26 @@ class BeastModeBot:
                 self.logger.error(f"Error in trading cycle #{cycle_count}: {e}")
                 await asyncio.sleep(60)
 
-    async def _check_daily_ai_limits(self, xai_client: XAIClient) -> bool:
+    async def _check_daily_ai_limits(self, xai_client: Optional[XAIClient]) -> bool:
         """
         Check if we should continue trading based on daily AI cost limits.
         Returns True if we can continue, False if we should pause.
         """
         if not settings.trading.enable_daily_cost_limiting:
             return True
-        
-        # Use the client's reset-aware check (handles new-day resets)
+
+        # If no xAI client, check OpenRouter cost limits via model_router
+        if xai_client is None:
+            # OpenRouter cost tracking is in model_router, not doing per-request limits
+            # So just allow to proceed (OpenRouter will handle cost limits)
+            return True
+
+        # Use the xAI client's reset-aware check (handles new-day resets)
         if hasattr(xai_client, '_check_daily_limits'):
             can_proceed = await xai_client._check_daily_limits()
             if not can_proceed:
                 self.logger.warning(
-                    "🚫 Daily AI cost limit reached - trading paused",
+                    "[LIMITS] Daily AI cost limit reached - trading paused",
                     daily_cost=xai_client.daily_tracker.total_cost,
                     daily_limit=xai_client.daily_tracker.daily_limit,
                     requests_today=xai_client.daily_tracker.request_count
@@ -269,17 +287,17 @@ class BeastModeBot:
         if sleep_time > 0:
             hours_to_sleep = sleep_time / 3600
             self.logger.info(
-                f"💤 Sleeping until next day to reset AI limits - {hours_to_sleep:.1f} hours"
+                f"[SLEEP] Sleeping until next day to reset AI limits - {hours_to_sleep:.1f} hours"
             )
-            
+
             # Sleep in chunks to allow for graceful shutdown
             chunk_size = 300  # 5 minutes per chunk
             while sleep_time > 0 and not self.shutdown_event.is_set():
                 current_chunk = min(chunk_size, sleep_time)
                 await asyncio.sleep(current_chunk)
                 sleep_time -= current_chunk
-            
-            self.logger.info("🌅 Daily AI limits reset - resuming trading")
+
+            self.logger.info("[SLEEP] Daily AI limits reset - resuming trading")
         else:
             # Safety fallback
             await asyncio.sleep(60)
@@ -288,7 +306,7 @@ class BeastModeBot:
         """Background task for position tracking and exit strategies."""
         while not self.shutdown_event.is_set():
             try:
-                # ✅ FIXED: Pass the shared database manager
+                # [OK] FIXED: Pass the shared database manager
                 await run_tracking(db_manager)
                 await asyncio.sleep(120)  # Check positions every 2 minutes (slower to reduce API load)
             except Exception as e:
@@ -316,7 +334,7 @@ class BeastModeBot:
 async def main():
     """Main entry point with command line argument parsing."""
     parser = argparse.ArgumentParser(
-        description="Beast Mode Trading Bot 🚀 - Advanced Multi-Strategy Trading System",
+        description="Beast Mode Trading Bot [START] - Advanced Multi-Strategy Trading System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -368,8 +386,8 @@ Beast Mode Features:
         if pkl_files:
             for f in pkl_files:
                 os.remove(f)
-                print(f"✅ Deleted {f}")
-            print("🔄 Daily AI limits reset. Restart the bot to continue trading.")
+                print(f"[OK] Deleted {f}")
+            print("[CYCLE] Daily AI limits reset. Restart the bot to continue trading.")
         else:
             print("ℹ️  No daily limit files found — limits are already clean.")
         return
@@ -379,9 +397,9 @@ Beast Mode Features:
     
     # Warn about live mode
     if args.live and not args.dashboard:
-        print("⚠️  WARNING: LIVE TRADING MODE ENABLED")
-        print("💰 This will use real money and place actual trades!")
-        print("🚀 LIVE TRADING MODE CONFIRMED")
+        print("[WARNING]  WARNING: LIVE TRADING MODE ENABLED")
+        print("[MONEY] This will use real money and place actual trades!")
+        print("[START] LIVE TRADING MODE CONFIRMED")
     
     # Create and run Beast Mode Bot
     bot = BeastModeBot(live_mode=args.live, dashboard_mode=args.dashboard)
@@ -392,7 +410,7 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\n👋 Beast Mode Bot stopped by user")
+        print("\n[BYE] Beast Mode Bot stopped by user")
     except Exception as e:
-        print(f"❌ Beast Mode Bot error: {e}")
+        print(f"[FAIL] Beast Mode Bot error: {e}")
         raise 

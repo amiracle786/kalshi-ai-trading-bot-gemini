@@ -174,7 +174,7 @@ if __name__ == "__main__":
         test_case = TestIssue9PriceFieldFix()
         test_case.setUp()
         await test_case.test_execute_position_with_fix()
-        print("✅ Async test passed!")
+        print("[OK] Async test passed!")
     
     # Run sync tests
     unittest.main(argv=[''], verbosity=2, exit=False)
@@ -182,4 +182,4 @@ if __name__ == "__main__":
     # Run async test
     print("\n🧪 Running async test...")
     asyncio.run(run_async_test())
-    print("\n✅ All tests passed! Issue #9 fix is working correctly.")
+    print("\n[OK] All tests passed! Issue #9 fix is working correctly.")

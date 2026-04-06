@@ -48,11 +48,11 @@ Be specific and actionable.
             temperature=0.3
         )
         
-        print("🎯 GROK4 TRADING SYSTEM ANALYSIS")
+        print("[TARGET] GROK4 TRADING SYSTEM ANALYSIS")
         print("=" * 60)
         print(response_content)
         print("=" * 60)
-        print(f"💰 Analysis cost: ${cost:.4f}")
+        print(f"[MONEY] Analysis cost: ${cost:.4f}")
         
         # Save to file
         with open('grok4_full_analysis.txt', 'w') as f:
@@ -64,7 +64,7 @@ Be specific and actionable.
         print(f"\n💾 Full analysis saved to: grok4_full_analysis.txt")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[FAIL] Error: {e}")
     finally:
         await xai_client.close()
 

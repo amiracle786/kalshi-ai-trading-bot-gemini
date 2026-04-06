@@ -40,7 +40,7 @@ async def test_full_trading_cycle():
         
         # Store the test market in database
         await db_manager.upsert_markets([test_market])
-        print(f"✅ Market stored in database")
+        print(f"[OK] Market stored in database")
         
         # Step 2: Decision making with real AI
         print("🤖 Testing decision making process...")
@@ -49,14 +49,14 @@ async def test_full_trading_cycle():
         )
         
         if position:
-            print(f"✅ Decision made: {position.side} {position.quantity} @ ${position.entry_price}")
+            print(f"[OK] Decision made: {position.side} {position.quantity} @ ${position.entry_price}")
             
             # Step 3: Execute position (this creates the position in database)
-            print("🚀 Testing position execution...")
+            print("[START] Testing position execution...")
             execution_result = await execute_position(position, kalshi_client)
             
             if execution_result:
-                print(f"✅ Position executed successfully")
+                print(f"[OK] Position executed successfully")
                 
                 # Verify position was stored
                 stored_positions = await db_manager.get_open_positions()
@@ -64,13 +64,13 @@ async def test_full_trading_cycle():
                 
                 stored_position = stored_positions[0]
                 assert stored_position.market_id == test_market.market_id
-                print(f"✅ Position verified in database: {stored_position.market_id}")
+                print(f"[OK] Position verified in database: {stored_position.market_id}")
             else:
-                print("📊 Position execution returned False (may be intentional based on market conditions)")
+                print("[DATA] Position execution returned False (may be intentional based on market conditions)")
         else:
-            print("📊 AI decided not to trade this market (valid outcome)")
+            print("[DATA] AI decided not to trade this market (valid outcome)")
         
-        print("✅ End-to-end test completed successfully")
+        print("[OK] End-to-end test completed successfully")
         
     finally:
         await kalshi_client.close()

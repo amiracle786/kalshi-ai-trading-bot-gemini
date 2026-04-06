@@ -19,18 +19,18 @@ from src.utils.database import DatabaseManager
 async def fix_database_schema():
     """Fix database schema issues and run migrations."""
     
-    print("🔧 Database Schema Fix Script")
+    print("[TOOL] Database Schema Fix Script")
     print("=" * 50)
     
     db_manager = DatabaseManager()
     
     try:
-        print("📊 Initializing database and running migrations...")
+        print("[DATA] Initializing database and running migrations...")
         await db_manager.initialize()
-        print("✅ Database initialization complete!")
+        print("[OK] Database initialization complete!")
         
         # Test strategy column in positions
-        print("\n🔍 Checking positions table schema...")
+        print("\n[SEARCH] Checking positions table schema...")
         import aiosqlite
         async with aiosqlite.connect(db_manager.db_path) as db:
             cursor = await db.execute("PRAGMA table_info(positions)")
@@ -38,41 +38,41 @@ async def fix_database_schema():
             column_names = [col[1] for col in columns]
             
             if 'strategy' in column_names:
-                print("✅ Strategy column exists in positions table")
+                print("[OK] Strategy column exists in positions table")
             else:
-                print("❌ Strategy column missing from positions table")
-                print("🔧 Adding strategy column...")
+                print("[FAIL] Strategy column missing from positions table")
+                print("[TOOL] Adding strategy column...")
                 await db.execute("ALTER TABLE positions ADD COLUMN strategy TEXT")
                 await db.commit()
-                print("✅ Strategy column added to positions table")
+                print("[OK] Strategy column added to positions table")
         
         # Test strategy column in trade_logs
-        print("\n🔍 Checking trade_logs table schema...")
+        print("\n[SEARCH] Checking trade_logs table schema...")
         async with aiosqlite.connect(db_manager.db_path) as db:
             cursor = await db.execute("PRAGMA table_info(trade_logs)")
             columns = await cursor.fetchall()
             column_names = [col[1] for col in columns]
             
             if 'strategy' in column_names:
-                print("✅ Strategy column exists in trade_logs table")
+                print("[OK] Strategy column exists in trade_logs table")
             else:
-                print("❌ Strategy column missing from trade_logs table")
-                print("🔧 Adding strategy column...")
+                print("[FAIL] Strategy column missing from trade_logs table")
+                print("[TOOL] Adding strategy column...")
                 await db.execute("ALTER TABLE trade_logs ADD COLUMN strategy TEXT")
                 await db.commit()
-                print("✅ Strategy column added to trade_logs table")
+                print("[OK] Strategy column added to trade_logs table")
         
         # Test llm_queries table
-        print("\n🔍 Checking llm_queries table...")
+        print("\n[SEARCH] Checking llm_queries table...")
         async with aiosqlite.connect(db_manager.db_path) as db:
             cursor = await db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='llm_queries'")
             table_exists = await cursor.fetchone()
             
             if table_exists:
-                print("✅ LLM queries table exists")
+                print("[OK] LLM queries table exists")
             else:
-                print("❌ LLM queries table missing")
-                print("🔧 Creating llm_queries table...")
+                print("[FAIL] LLM queries table missing")
+                print("[TOOL] Creating llm_queries table...")
                 await db.execute("""
                     CREATE TABLE llm_queries (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -89,13 +89,13 @@ async def fix_database_schema():
                     )
                 """)
                 await db.commit()
-                print("✅ LLM queries table created")
+                print("[OK] LLM queries table created")
         
         # Test performance query
-        print("\n🔍 Testing performance query...")
+        print("\n[SEARCH] Testing performance query...")
         try:
             performance = await db_manager.get_performance_by_strategy()
-            print(f"✅ Performance query successful: {len(performance)} strategies found")
+            print(f"[OK] Performance query successful: {len(performance)} strategies found")
             
             if performance:
                 for strategy, stats in performance.items():
@@ -104,13 +104,13 @@ async def fix_database_schema():
                 print("   ℹ️ No strategy performance data found (normal for new systems)")
                 
         except Exception as e:
-            print(f"❌ Performance query failed: {e}")
+            print(f"[FAIL] Performance query failed: {e}")
         
         # Test LLM query
-        print("\n🔍 Testing LLM queries...")
+        print("\n[SEARCH] Testing LLM queries...")
         try:
             queries = await db_manager.get_llm_queries(hours_back=24, limit=5)
-            print(f"✅ LLM query successful: {len(queries)} queries found")
+            print(f"[OK] LLM query successful: {len(queries)} queries found")
             
             if queries:
                 for query in queries:
@@ -119,13 +119,13 @@ async def fix_database_schema():
                 print("   ℹ️ No LLM queries found (normal until trading system runs)")
                 
         except Exception as e:
-            print(f"❌ LLM query failed: {e}")
+            print(f"[FAIL] LLM query failed: {e}")
         
         print("\n🎉 Database schema fix complete!")
-        print("📊 Dashboard should now work properly")
+        print("[DATA] Dashboard should now work properly")
         
     except Exception as e:
-        print(f"❌ Error fixing database schema: {e}")
+        print(f"[FAIL] Error fixing database schema: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -169,13 +169,13 @@ async def verify_database_health():
             except:
                 llm_count = "Table not created yet"
         
-        print(f"📊 Markets: {markets_count}")
+        print(f"[DATA] Markets: {markets_count}")
         print(f"💼 Positions: {positions_count}")
-        print(f"📈 Trades: {trades_count}")
+        print(f"[UP] Trades: {trades_count}")
         print(f"🤖 LLM Queries: {llm_count}")
         
     except Exception as e:
-        print(f"❌ Database health check failed: {e}")
+        print(f"[FAIL] Database health check failed: {e}")
     
     finally:
         await db_manager.close()
@@ -187,9 +187,9 @@ if __name__ == "__main__":
         await verify_database_health()
         
         if success:
-            print("\n🚀 Ready to launch dashboard!")
+            print("\n[START] Ready to launch dashboard!")
             print("Run: python launch_dashboard.py")
         else:
-            print("\n❌ Database fix failed - check errors above")
+            print("\n[FAIL] Database fix failed - check errors above")
     
     asyncio.run(main()) 

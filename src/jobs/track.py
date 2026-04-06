@@ -144,7 +144,7 @@ async def run_tracking(db_manager: Optional[DatabaseManager] = None):
         # Step 1: Place sell limit orders for profit-taking and stop-loss
         from src.jobs.execute import place_profit_taking_orders, place_stop_loss_orders
         
-        logger.info("🎯 Checking for profit-taking opportunities...")
+        logger.info("[TARGET] Checking for profit-taking opportunities...")
         profit_results = await place_profit_taking_orders(
             db_manager=db_manager,
             kalshi_client=kalshi_client,
@@ -160,7 +160,7 @@ async def run_tracking(db_manager: Optional[DatabaseManager] = None):
         
         total_sell_orders = profit_results['orders_placed'] + stop_loss_results['orders_placed']
         if total_sell_orders > 0:
-            logger.info(f"📈 SELL LIMIT ORDERS SUMMARY: {total_sell_orders} orders placed")
+            logger.info(f"[UP] SELL LIMIT ORDERS SUMMARY: {total_sell_orders} orders placed")
             logger.info(f"   Profit-taking: {profit_results['orders_placed']} orders")
             logger.info(f"   Stop-loss: {stop_loss_results['orders_placed']} orders")
         

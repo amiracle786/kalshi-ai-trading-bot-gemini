@@ -163,7 +163,7 @@ class LoggingConfig:
     backup_count: int = 5
 
 
-# BEAST MODE UNIFIED TRADING SYSTEM CONFIGURATION 🚀
+# BEAST MODE UNIFIED TRADING SYSTEM CONFIGURATION [START]
 # These settings control the advanced multi-strategy trading system
 
 # === CAPITAL ALLOCATION ACROSS STRATEGIES ===
@@ -261,8 +261,9 @@ class Settings:
         if not self.api.kalshi_api_key:
             raise ValueError("KALSHI_API_KEY environment variable is required")
 
-        if not self.api.xai_api_key:
-            raise ValueError("XAI_API_KEY environment variable is required")
+        # Claude-only mode: XAI_API_KEY not required
+        # if not self.api.xai_api_key:
+        #     raise ValueError("XAI_API_KEY environment variable is required")
 
         if self.trading.max_position_size_pct <= 0 or self.trading.max_position_size_pct > 100:
             raise ValueError("max_position_size_pct must be between 0 and 100")

@@ -95,7 +95,7 @@ class QuickFlipScalpingStrategy:
         """
         opportunities = []
         
-        self.logger.info(f"🔍 Analyzing {len(markets)} markets for quick flip opportunities")
+        self.logger.info(f"[SEARCH] Analyzing {len(markets)} markets for quick flip opportunities")
         
         for market in markets:
             try:
@@ -147,7 +147,7 @@ class QuickFlipScalpingStrategy:
         filtered_opportunities = opportunities[:max_positions]
         
         self.logger.info(
-            f"🎯 Found {len(filtered_opportunities)} quick flip opportunities "
+            f"[TARGET] Found {len(filtered_opportunities)} quick flip opportunities "
             f"(from {len(opportunities)} total analyzed)"
         )
         
@@ -306,7 +306,7 @@ REASON: [brief explanation]
             'failed_executions': 0
         }
         
-        self.logger.info(f"🚀 Executing {len(opportunities)} quick flip opportunities")
+        self.logger.info(f"[START] Executing {len(opportunities)} quick flip opportunities")
         
         for opportunity in opportunities:
             try:
@@ -330,7 +330,7 @@ REASON: [brief explanation]
                 continue
         
         self.logger.info(
-            f"✅ Quick Flip Execution Summary: "
+            f"[OK] Quick Flip Execution Summary: "
             f"{results['positions_created']} positions, "
             f"{results['sell_orders_placed']} sell orders, "
             f"${results['total_capital_used']:.0f} capital used"
@@ -376,12 +376,12 @@ REASON: [brief explanation]
             if success:
                 self.active_positions[opportunity.market_id] = position
                 self.logger.info(
-                    f"✅ Quick flip entry: {opportunity.side} {opportunity.quantity} "
+                    f"[OK] Quick flip entry: {opportunity.side} {opportunity.quantity} "
                     f"at ${opportunity.entry_price:.2f} for {opportunity.market_id}"
                 )
                 return True
             else:
-                self.logger.error(f"❌ Failed to execute quick flip for {opportunity.market_id}")
+                self.logger.error(f"[FAIL] Failed to execute quick flip for {opportunity.market_id}")
                 return False
                 
         except Exception as e:
@@ -418,7 +418,7 @@ REASON: [brief explanation]
                 }
                 
                 self.logger.info(
-                    f"🎯 Sell order placed: {position.side} {position.quantity} "
+                    f"[TARGET] Sell order placed: {position.side} {position.quantity} "
                     f"at ${opportunity.exit_price:.2f} for {opportunity.market_id}"
                 )
                 return True
@@ -503,7 +503,7 @@ REASON: [brief explanation]
                 
                 if response and 'order' in response:
                     self.logger.info(
-                        f"🛑 Loss cut order placed: {position.side} {position.quantity} "
+                        f"[STOP] Loss cut order placed: {position.side} {position.quantity} "
                         f"MARKET SELL for {position.market_id}"
                     )
                     return True
@@ -512,7 +512,7 @@ REASON: [brief explanation]
                     return False
             else:
                 self.logger.info(
-                    f"📝 SIMULATED loss cut: {position.side} {position.quantity} "
+                    f"[NOTE] SIMULATED loss cut: {position.side} {position.quantity} "
                     f"MARKET SELL for {position.market_id}"
                 )
                 return True
@@ -535,7 +535,7 @@ async def run_quick_flip_strategy(
     logger = get_trading_logger("quick_flip_main")
     
     try:
-        logger.info("🎯 Starting Quick Flip Scalping Strategy")
+        logger.info("[TARGET] Starting Quick Flip Scalping Strategy")
         
         # Initialize strategy
         strategy = QuickFlipScalpingStrategy(
@@ -576,7 +576,7 @@ async def run_quick_flip_strategy(
         }
         
         logger.info(
-            f"🏁 Quick Flip Strategy Complete: "
+            f"[END] Quick Flip Strategy Complete: "
             f"{execution_results['positions_created']} new positions, "
             f"${execution_results['total_capital_used']:.0f} capital used, "
             f"${execution_results['expected_profit']:.2f} expected profit"

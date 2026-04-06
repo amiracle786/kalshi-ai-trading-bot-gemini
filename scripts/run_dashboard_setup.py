@@ -29,16 +29,16 @@ def check_requirements():
             missing.append(package)
     
     if missing:
-        print("❌ Missing required packages:")
+        print("[FAIL] Missing required packages:")
         for pkg in missing:
             print(f"   - {pkg}")
         print("\n📦 Installing missing packages...")
         
         try:
             subprocess.run([sys.executable, "-m", "pip", "install"] + missing, check=True)
-            print("✅ Packages installed successfully!")
+            print("[OK] Packages installed successfully!")
         except subprocess.CalledProcessError:
-            print("❌ Failed to install packages. Please run:")
+            print("[FAIL] Failed to install packages. Please run:")
             print(f"   pip install {' '.join(missing)}")
             return False
     
@@ -46,7 +46,7 @@ def check_requirements():
 
 async def fix_database():
     """Fix database schema and ensure it's ready."""
-    print("🔧 Fixing database schema...")
+    print("[TOOL] Fixing database schema...")
     
     # Add parent directory to path for imports
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -58,7 +58,7 @@ async def fix_database():
     
     try:
         await db_manager.initialize()
-        print("✅ Database initialized")
+        print("[OK] Database initialized")
         
         # Check and fix positions table
         async with aiosqlite.connect(db_manager.db_path) as db:
@@ -67,10 +67,10 @@ async def fix_database():
             column_names = [col[1] for col in columns]
             
             if 'strategy' not in column_names:
-                print("🔧 Adding strategy column to positions table...")
+                print("[TOOL] Adding strategy column to positions table...")
                 await db.execute("ALTER TABLE positions ADD COLUMN strategy TEXT")
                 await db.commit()
-                print("✅ Strategy column added to positions")
+                print("[OK] Strategy column added to positions")
         
         # Check and fix trade_logs table
         async with aiosqlite.connect(db_manager.db_path) as db:
@@ -79,10 +79,10 @@ async def fix_database():
             column_names = [col[1] for col in columns]
             
             if 'strategy' not in column_names:
-                print("🔧 Adding strategy column to trade_logs table...")
+                print("[TOOL] Adding strategy column to trade_logs table...")
                 await db.execute("ALTER TABLE trade_logs ADD COLUMN strategy TEXT")
                 await db.commit()
-                print("✅ Strategy column added to trade_logs")
+                print("[OK] Strategy column added to trade_logs")
         
         # Check and create llm_queries table
         async with aiosqlite.connect(db_manager.db_path) as db:
@@ -90,7 +90,7 @@ async def fix_database():
             table_exists = await cursor.fetchone()
             
             if not table_exists:
-                print("🔧 Creating llm_queries table...")
+                print("[TOOL] Creating llm_queries table...")
                 await db.execute("""
                     CREATE TABLE llm_queries (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,29 +107,29 @@ async def fix_database():
                     )
                 """)
                 await db.commit()
-                print("✅ LLM queries table created")
+                print("[OK] LLM queries table created")
         
         # Test performance query
         performance = await db_manager.get_performance_by_strategy()
-        print(f"✅ Performance query test passed: {len(performance)} strategies")
+        print(f"[OK] Performance query test passed: {len(performance)} strategies")
         
         # Test LLM query
         queries = await db_manager.get_llm_queries(hours_back=24, limit=1)
-        print(f"✅ LLM query test passed: {len(queries)} queries")
+        print(f"[OK] LLM query test passed: {len(queries)} queries")
         
         await db_manager.close()
-        print("✅ Database ready for dashboard")
+        print("[OK] Database ready for dashboard")
         return True
         
     except Exception as e:
-        print(f"❌ Database fix failed: {e}")
+        print(f"[FAIL] Database fix failed: {e}")
         import traceback
         traceback.print_exc()
         return False
 
 def launch_dashboard():
     """Launch the Streamlit dashboard."""
-    print("🚀 Launching dashboard...")
+    print("[START] Launching dashboard...")
     
     try:
         subprocess.run([
@@ -139,32 +139,32 @@ def launch_dashboard():
             "--browser.gatherUsageStats", "false"
         ])
     except KeyboardInterrupt:
-        print("\n👋 Dashboard stopped")
+        print("\n[BYE] Dashboard stopped")
     except Exception as e:
-        print(f"❌ Failed to launch dashboard: {e}")
+        print(f"[FAIL] Failed to launch dashboard: {e}")
         return False
     
     return True
 
 async def main():
     """Main setup function."""
-    print("🎯 Trading Dashboard Setup")
+    print("[TARGET] Trading Dashboard Setup")
     print("=" * 50)
     
     # Check if we're in the right directory
     if not Path("trading_dashboard.py").exists():
-        print("❌ Error: trading_dashboard.py not found")
-        print("💡 Make sure you're running this from the kalshi project root")
+        print("[FAIL] Error: trading_dashboard.py not found")
+        print("[IDEA] Make sure you're running this from the kalshi project root")
         return False
     
     # Check requirements
     print("📦 Checking requirements...")
     if not check_requirements():
         return False
-    print("✅ Requirements satisfied")
+    print("[OK] Requirements satisfied")
     
     # Fix database
-    print("\n🔧 Setting up database...")
+    print("\n[TOOL] Setting up database...")
     if not await fix_database():
         return False
     

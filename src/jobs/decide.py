@@ -404,13 +404,13 @@ async def make_decision_for_market(
             )
             
             if not should_trade:
-                logger.info(f"❌ EDGE FILTER REJECTED: {market.market_id} - {trade_reason}")
+                logger.info(f"[FAIL] EDGE FILTER REJECTED: {market.market_id} - {trade_reason}")
                 await db_manager.record_market_analysis(
                     market.market_id, "EDGE_FILTERED", decision.confidence, total_analysis_cost, trade_reason
                 )
                 return None
                 
-            logger.info(f"✅ EDGE FILTER APPROVED: {market.market_id} - {trade_reason}")
+            logger.info(f"[OK] EDGE FILTER APPROVED: {market.market_id} - {trade_reason}")
             
             # Check position limits before calculating quantity
             from src.utils.position_limits import check_can_add_position
@@ -427,7 +427,7 @@ async def make_decision_for_market(
             
             if not can_add_position:
                 # Instead of blocking, try to find a smaller position size that fits
-                logger.info(f"⚠️ Position size ${initial_position_value:.2f} exceeds limits, attempting to reduce...")
+                logger.info(f"[WARNING] Position size ${initial_position_value:.2f} exceeds limits, attempting to reduce...")
                 
                 # Try progressively smaller position sizes
                 for reduction_factor in [0.8, 0.6, 0.4, 0.2, 0.1]:
@@ -444,7 +444,7 @@ async def make_decision_for_market(
                     if can_add_reduced:
                         initial_position_value = reduced_position_value
                         initial_quantity = reduced_quantity
-                        logger.info(f"✅ Position size reduced to ${initial_position_value:.2f} ({initial_quantity} contracts) to fit limits")
+                        logger.info(f"[OK] Position size reduced to ${initial_position_value:.2f} ({initial_quantity} contracts) to fit limits")
                         break
                 else:
                     # If even the smallest size doesn't fit, check if it's due to position count
@@ -453,19 +453,19 @@ async def make_decision_for_market(
                     current_positions = await limits_manager._get_position_count()
                     
                     if current_positions >= limits_manager.max_positions:
-                        logger.info(f"❌ POSITION COUNT LIMIT: {current_positions}/{limits_manager.max_positions} positions - cannot add new position")
+                        logger.info(f"[FAIL] POSITION COUNT LIMIT: {current_positions}/{limits_manager.max_positions} positions - cannot add new position")
                         await db_manager.record_market_analysis(
                             market.market_id, "POSITION_LIMITS", decision.confidence, total_analysis_cost, "Position count limit reached"
                         )
                         return None
                     else:
-                        logger.info(f"❌ POSITION SIZE LIMIT: Even minimum size ${initial_position_value * 0.1:.2f} exceeds limits")
+                        logger.info(f"[FAIL] POSITION SIZE LIMIT: Even minimum size ${initial_position_value * 0.1:.2f} exceeds limits")
                         await db_manager.record_market_analysis(
                             market.market_id, "POSITION_LIMITS", decision.confidence, total_analysis_cost, "Position size limit exceeded"
                         )
                         return None
             
-            logger.info(f"✅ POSITION LIMITS OK: ${initial_position_value:.2f} ({initial_quantity} contracts)")
+            logger.info(f"[OK] POSITION LIMITS OK: ${initial_position_value:.2f} ({initial_quantity} contracts)")
             
             # Check cash reserves before proceeding with trade
             from src.utils.cash_reserves import check_can_trade_with_cash_reserves
@@ -476,13 +476,13 @@ async def make_decision_for_market(
             )
             
             if not can_trade_cash:
-                logger.info(f"❌ CASH RESERVES INSUFFICIENT: {market.market_id} - {cash_reason}")
+                logger.info(f"[FAIL] CASH RESERVES INSUFFICIENT: {market.market_id} - {cash_reason}")
                 await db_manager.record_market_analysis(
                     market.market_id, "CASH_RESERVES", decision.confidence, total_analysis_cost, cash_reason
                 )
                 return None
             
-            logger.info(f"✅ CASH RESERVES OK: {market.market_id} - {cash_reason}")
+            logger.info(f"[OK] CASH RESERVES OK: {market.market_id} - {cash_reason}")
             quantity = initial_quantity
 
             if quantity > 0:

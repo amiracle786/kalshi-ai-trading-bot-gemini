@@ -25,7 +25,7 @@ async def test_immediate_trading_fix():
     setup_logging()
     logger = logging.getLogger("immediate_fix_test")
     
-    logger.info("🎯 Testing Immediate Trading Fix")
+    logger.info("[TARGET] Testing Immediate Trading Fix")
     
     # Initialize clients
     kalshi_client = KalshiClient()
@@ -36,13 +36,13 @@ async def test_immediate_trading_fix():
         await db_manager.initialize()
         
         # 1. Check initial Kalshi positions
-        logger.info("📊 Checking initial Kalshi positions...")
+        logger.info("[DATA] Checking initial Kalshi positions...")
         initial_positions = await kalshi_client.get_positions()
         initial_markets = {pos['ticker']: pos['position'] for pos in initial_positions.get('market_positions', [])}
         logger.info(f"Initial positions in {len(initial_markets)} markets")
         
         # 2. Find ACTUALLY TRADEABLE markets 
-        logger.info("🔍 Finding TRADEABLE markets (not just any markets)...")
+        logger.info("[SEARCH] Finding TRADEABLE markets (not just any markets)...")
         
         # Get markets with more specific criteria for active trading
         markets_response = await kalshi_client.get_markets(
@@ -79,15 +79,15 @@ async def test_immediate_trading_fix():
             logger.info(f"   {i+1}. {ticker}: vol={volume:,}, YES={yes_ask}¢, NO={no_ask}¢")
         
         if not tradeable_markets:
-            logger.error("❌ No tradeable markets found - all markets may be closed or have no liquidity")
-            logger.info("💡 This is expected during off-hours or when markets are closed")
+            logger.error("[FAIL] No tradeable markets found - all markets may be closed or have no liquidity")
+            logger.info("[IDEA] This is expected during off-hours or when markets are closed")
             return False
         
         # Use the first tradeable market
         test_market_data = tradeable_markets[0]
         
         ticker = test_market_data['ticker']
-        logger.info(f"📈 Using test market: {ticker}")
+        logger.info(f"[UP] Using test market: {ticker}")
         logger.info(f"   Volume: {test_market_data.get('volume', 0):,}")
         logger.info(f"   Prices: YES={test_market_data.get('yes_ask')}¢, NO={test_market_data.get('no_ask')}¢")
         
@@ -106,7 +106,7 @@ async def test_immediate_trading_fix():
         )
         
         # 4. Test immediate trading by creating opportunities
-        logger.info("🚀 Testing immediate trading opportunity creation...")
+        logger.info("[START] Testing immediate trading opportunity creation...")
         opportunities = await create_market_opportunities_from_markets(
             [market], xai_client, kalshi_client, db_manager, 1000  # $1000 test capital
         )
@@ -129,14 +129,14 @@ async def test_immediate_trading_fix():
             db_positions = await cursor.fetchall()
         
         if db_positions:
-            logger.info(f"✅ Found {len(db_positions)} positions in database for {ticker}")
+            logger.info(f"[OK] Found {len(db_positions)} positions in database for {ticker}")
             for pos in db_positions:
                 logger.info(f"   {pos[0]}: {pos[1]} {pos[2]} shares, live={pos[3]}, status={pos[4]}")
         else:
-            logger.info(f"⚠️ No positions found in database for {ticker}")
+            logger.info(f"[WARNING] No positions found in database for {ticker}")
         
         # 7. Check Kalshi for new positions  
-        logger.info("📊 Checking Kalshi for new positions...")
+        logger.info("[DATA] Checking Kalshi for new positions...")
         final_positions = await kalshi_client.get_positions()
         final_markets = {pos['ticker']: pos['position'] for pos in final_positions.get('market_positions', [])}
         
@@ -145,19 +145,19 @@ async def test_immediate_trading_fix():
         initial_position = initial_markets.get(ticker, 0)
         
         if new_position != initial_position:
-            logger.info(f"✅ SUCCESS! New position in {ticker}: {new_position} contracts (was {initial_position})")
+            logger.info(f"[OK] SUCCESS! New position in {ticker}: {new_position} contracts (was {initial_position})")
             return True
         else:
-            logger.error(f"❌ NO position change in {ticker} on Kalshi (still {initial_position})")
+            logger.error(f"[FAIL] NO position change in {ticker} on Kalshi (still {initial_position})")
             
             # If database has position but Kalshi doesn't, it means our execution failed
             if db_positions:
-                logger.error("🚨 CRITICAL: Database has position but Kalshi doesn't - orders not actually placed!")
+                logger.error("[ALERT] CRITICAL: Database has position but Kalshi doesn't - orders not actually placed!")
             
             return False
         
     except Exception as e:
-        logger.error(f"❌ Test failed: {e}")
+        logger.error(f"[FAIL] Test failed: {e}")
         import traceback
         traceback.print_exc()
         return False

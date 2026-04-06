@@ -31,9 +31,9 @@ async def get_test_markets(limit: int = 10) -> List[Dict[str, Any]]:
                 # Fetch only a small number of markets for testing
                 markets_response = await kalshi_client.get_markets(limit=limit)
                 _MARKETS_CACHE = markets_response.get('markets', [])[:limit]
-                print(f"✅ Cached {len(_MARKETS_CACHE)} markets for testing")
+                print(f"[OK] Cached {len(_MARKETS_CACHE)} markets for testing")
             except Exception as e:
-                print(f"❌ Failed to fetch test markets: {e}")
+                print(f"[FAIL] Failed to fetch test markets: {e}")
                 _MARKETS_CACHE = []
             finally:
                 await kalshi_client.close()
@@ -85,7 +85,7 @@ async def get_test_market_data(market_id: str) -> Optional[Dict[str, Any]]:
         market_response = await kalshi_client.get_market(market_id)
         return market_response.get('market') if market_response else None
     except Exception as e:
-        print(f"❌ Failed to fetch market {market_id}: {e}")
+        print(f"[FAIL] Failed to fetch market {market_id}: {e}")
         return None
     finally:
         await kalshi_client.close()

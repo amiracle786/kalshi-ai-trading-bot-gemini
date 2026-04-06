@@ -15,7 +15,7 @@ from pathlib import Path
 def print_header(title):
     """Print a formatted header."""
     print(f"\n{'=' * 60}")
-    print(f"🚀 {title}")
+    print(f"[START] {title}")
     print(f"{'=' * 60}")
 
 
@@ -32,14 +32,14 @@ def check_python_version():
     
     if version.major == 3 and version.minor >= 12:
         if version.minor == 14:
-            print("⚠️  Python 3.14 detected. You may encounter PyO3 issues.")
+            print("[WARNING]  Python 3.14 detected. You may encounter PyO3 issues.")
             print("   Consider using Python 3.12 or 3.13 for best compatibility.")
             return "warning"
         else:
-            print("✅ Python version is compatible.")
+            print("[OK] Python version is compatible.")
             return "ok"
     else:
-        print("❌ Python 3.12+ required. Please upgrade your Python version.")
+        print("[FAIL] Python 3.12+ required. Please upgrade your Python version.")
         return "error"
 
 
@@ -52,12 +52,12 @@ def check_virtual_environment():
     )
     
     if in_venv:
-        print("✅ Running in virtual environment.")
+        print("[OK] Running in virtual environment.")
         if os.environ.get('VIRTUAL_ENV'):
             print(f"   Virtual env path: {os.environ['VIRTUAL_ENV']}")
         return True
     else:
-        print("⚠️  Not running in a virtual environment.")
+        print("[WARNING]  Not running in a virtual environment.")
         print("   It's recommended to use a virtual environment.")
         return False
 
@@ -74,9 +74,9 @@ def check_dependencies():
     for package in required_packages:
         try:
             __import__(package)
-            print(f"✅ {package}")
+            print(f"[OK] {package}")
         except ImportError:
-            print(f"❌ {package} (missing)")
+            print(f"[FAIL] {package} (missing)")
             missing.append(package)
     
     return missing
@@ -107,7 +107,7 @@ def install_dependencies():
     env = os.environ.copy()
     if sys.version_info.minor == 14:
         env['PYO3_USE_ABI3_FORWARD_COMPATIBILITY'] = '1'
-        print("🔧 Setting PyO3 compatibility flag for Python 3.14")
+        print("[TOOL] Setting PyO3 compatibility flag for Python 3.14")
     
     success, stdout, stderr = run_command(
         f"{sys.executable} -m pip install -r requirements.txt",
@@ -115,10 +115,10 @@ def install_dependencies():
     )
     
     if success:
-        print("✅ Dependencies installed successfully.")
+        print("[OK] Dependencies installed successfully.")
         return True
     else:
-        print("❌ Failed to install dependencies.")
+        print("[FAIL] Failed to install dependencies.")
         print(f"Error: {stderr}")
         return False
 
@@ -130,18 +130,18 @@ def test_dashboard():
     try:
         # Test import
         import beast_mode_dashboard
-        print("✅ Dashboard imports successfully.")
+        print("[OK] Dashboard imports successfully.")
         
         # Test basic functionality
         dashboard = beast_mode_dashboard.BeastModeDashboard()
-        print("✅ Dashboard can be instantiated.")
+        print("[OK] Dashboard can be instantiated.")
         
         return True
     except ImportError as e:
-        print(f"❌ Dashboard import failed: {e}")
+        print(f"[FAIL] Dashboard import failed: {e}")
         return False
     except Exception as e:
-        print(f"❌ Dashboard test failed: {e}")
+        print(f"[FAIL] Dashboard test failed: {e}")
         return False
 
 
@@ -153,7 +153,7 @@ def create_venv_if_needed():
             print("Creating virtual environment...")
             success, _, _ = run_command(f"{sys.executable} -m venv .venv")
             if success:
-                print("✅ Virtual environment created.")
+                print("[OK] Virtual environment created.")
                 print("\nTo activate it:")
                 if platform.system() == "Windows":
                     print("   .venv\\Scripts\\activate")
@@ -162,7 +162,7 @@ def create_venv_if_needed():
                 print("\nThen run this setup script again.")
                 return False
             else:
-                print("❌ Failed to create virtual environment.")
+                print("[FAIL] Failed to create virtual environment.")
         return False
     return True
 
@@ -173,7 +173,7 @@ def main():
     
     # Check if we're in the right directory
     if not Path("beast_mode_dashboard.py").exists():
-        print("❌ beast_mode_dashboard.py not found.")
+        print("[FAIL] beast_mode_dashboard.py not found.")
         print("   Make sure you're running this from the kalshi-ai-trading-bot directory.")
         return False
     
@@ -191,7 +191,7 @@ def main():
     missing_deps = check_dependencies()
     
     if missing_deps:
-        print(f"\n⚠️  Missing dependencies: {', '.join(missing_deps)}")
+        print(f"\n[WARNING]  Missing dependencies: {', '.join(missing_deps)}")
         response = input("Install missing dependencies? (y/n): ")
         if response.lower().startswith('y'):
             if not install_dependencies():
@@ -200,20 +200,20 @@ def main():
             # Check again
             missing_deps = check_dependencies()
             if missing_deps:
-                print(f"❌ Still missing: {', '.join(missing_deps)}")
+                print(f"[FAIL] Still missing: {', '.join(missing_deps)}")
                 return False
     
     print_step(4, "Testing Dashboard")
     if not test_dashboard():
-        print("\n💡 Try these solutions:")
+        print("\n[IDEA] Try these solutions:")
         print("   1. Make sure you activated your virtual environment")
         print("   2. Run: pip install -r requirements.txt")
         print("   3. Check that you're in the project root directory")
         return False
     
     print_header("Setup Complete!")
-    print("✅ Your environment is ready!")
-    print("\n🚀 To run the dashboard:")
+    print("[OK] Your environment is ready!")
+    print("\n[START] To run the dashboard:")
     print("   python beast_mode_dashboard.py --summary")
     print("   python beast_mode_dashboard.py  # for live dashboard")
     

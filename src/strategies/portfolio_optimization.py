@@ -903,13 +903,13 @@ async def create_market_opportunities_from_markets(
                 opportunity.recommended_side = edge_result.side
                 
                 opportunities.append(opportunity)
-                logger.info(f"✅ EDGE APPROVED: {market.market_id} - Edge: {edge_result.edge_percentage:.1%} ({edge_result.side}), Confidence: {confidence:.1%}, Reason: {edge_result.reason}")
+                logger.info(f"[OK] EDGE APPROVED: {market.market_id} - Edge: {edge_result.edge_percentage:.1%} ({edge_result.side}), Confidence: {confidence:.1%}, Reason: {edge_result.reason}")
                 
-                # 🚀 IMMEDIATE TRADING: Place trade for strong opportunities
+                # [START] IMMEDIATE TRADING: Place trade for strong opportunities
                 if db_manager:
                     await _evaluate_immediate_trade(opportunity, db_manager, kalshi_client, total_capital)
             else:
-                logger.info(f"❌ EDGE FILTERED: {market.market_id} - {edge_result.reason}")
+                logger.info(f"[FAIL] EDGE FILTERED: {market.market_id} - {edge_result.reason}")
             
         except Exception as e:
             logger.error(f"Error creating opportunity from {market.market_id}: {e}")
@@ -975,14 +975,14 @@ async def _evaluate_immediate_trade(
             event_positions = positions_response.get('event_positions', []) if isinstance(positions_response, dict) else []
             active_positions = [p for p in event_positions if float(p.get('event_exposure_dollars', '0')) > 0]
             if active_positions:
-                logger.info(f"📊 Active positions: {len(active_positions)}")
+                logger.info(f"[DATA] Active positions: {len(active_positions)}")
                 for pos in active_positions:
                     ticker = pos.get('event_ticker', '?')
                     exposure = float(pos.get('event_exposure_dollars', '0'))
-                    logger.info(f"  📌 {ticker}: exposure=${exposure:.2f}")
+                    logger.info(f"  [PIN] {ticker}: exposure=${exposure:.2f}")
             
             total_portfolio_value = available_cash + total_position_value
-            logger.info(f"💰 Portfolio value: Cash=${available_cash:.2f} + Positions=${total_position_value:.2f} = Total=${total_portfolio_value:.2f}")
+            logger.info(f"[MONEY] Portfolio value: Cash=${available_cash:.2f} + Positions=${total_position_value:.2f} = Total=${total_portfolio_value:.2f}")
             
         except Exception as e:
             logger.warning(f"Could not get portfolio value, using available cash: {e}")
@@ -1015,7 +1015,7 @@ async def _evaluate_immediate_trade(
         
         if not can_add_position:
             # Instead of blocking, try to find a smaller position size that fits
-            logger.info(f"⚠️ Position size ${initial_position_size:.2f} exceeds limits, attempting to reduce...")
+            logger.info(f"[WARNING] Position size ${initial_position_size:.2f} exceeds limits, attempting to reduce...")
             
             # Try progressively smaller position sizes
             for reduction_factor in [0.8, 0.6, 0.4, 0.2, 0.1]:
@@ -1026,7 +1026,7 @@ async def _evaluate_immediate_trade(
                 
                 if can_add_reduced:
                     initial_position_size = reduced_position_size
-                    logger.info(f"✅ Position size reduced to ${initial_position_size:.2f} to fit limits")
+                    logger.info(f"[OK] Position size reduced to ${initial_position_size:.2f} to fit limits")
                     break
             else:
                 # If even the smallest size doesn't fit, check if it's due to position count
@@ -1035,13 +1035,13 @@ async def _evaluate_immediate_trade(
                 current_positions = await limits_manager._get_position_count()
                 
                 if current_positions >= limits_manager.max_positions:
-                    logger.info(f"❌ POSITION COUNT LIMIT: {current_positions}/{limits_manager.max_positions} positions - cannot add new position")
+                    logger.info(f"[FAIL] POSITION COUNT LIMIT: {current_positions}/{limits_manager.max_positions} positions - cannot add new position")
                     return
                 else:
-                    logger.info(f"❌ POSITION SIZE LIMIT: Even minimum size ${initial_position_size * 0.1:.2f} exceeds limits")
+                    logger.info(f"[FAIL] POSITION SIZE LIMIT: Even minimum size ${initial_position_size * 0.1:.2f} exceeds limits")
                     return
         
-        logger.info(f"✅ POSITION LIMITS OK FOR IMMEDIATE TRADE: ${initial_position_size:.2f}")
+        logger.info(f"[OK] POSITION LIMITS OK FOR IMMEDIATE TRADE: ${initial_position_size:.2f}")
         
         # Check if we already have a position in this market
         import aiosqlite
@@ -1057,13 +1057,13 @@ async def _evaluate_immediate_trade(
             logger.info(f"⏭️ Skipping immediate trade for {opportunity.market_id} - position already exists")
             return
         
-        # 🚀 STRONG OPPORTUNITY - TRADE IMMEDIATELY!
-        logger.info(f"🚀 IMMEDIATE TRADE: {opportunity.market_id} - Edge: {opportunity.edge:.1%}, Confidence: {opportunity.confidence:.1%}")
+        # [START] STRONG OPPORTUNITY - TRADE IMMEDIATELY!
+        logger.info(f"[START] IMMEDIATE TRADE: {opportunity.market_id} - Edge: {opportunity.edge:.1%}, Confidence: {opportunity.confidence:.1%}")
         
         # Use the position size that was already calculated and validated above
         position_size = initial_position_size
         
-        logger.info(f"💰 Using validated position size: ${position_size:.2f}")
+        logger.info(f"[MONEY] Using validated position size: ${position_size:.2f}")
         
         # Final cash reserves check with actual calculated size
         from src.utils.cash_reserves import check_can_trade_with_cash_reserves
@@ -1073,10 +1073,10 @@ async def _evaluate_immediate_trade(
         )
         
         if not can_trade_reserves:
-            logger.info(f"❌ CASH RESERVES CHECK FAILED: {opportunity.market_id} - {reserves_reason}")
+            logger.info(f"[FAIL] CASH RESERVES CHECK FAILED: {opportunity.market_id} - {reserves_reason}")
             return
         
-        logger.info(f"✅ CASH RESERVES APPROVED: ${position_size:.2f} - {reserves_reason}")
+        logger.info(f"[OK] CASH RESERVES APPROVED: ${position_size:.2f} - {reserves_reason}")
         
         # NO DOLLAR MINIMUM - we'll ensure at least 1 contract below
         
@@ -1097,7 +1097,7 @@ async def _evaluate_immediate_trade(
             logger.info(f"⏭️ Cannot afford minimum 1 contract: ${min_cost:.2f} > ${available_cash:.2f}")
             return
             
-        logger.info(f"📊 Trade details: {shares} {side} shares @ ${entry_price:.2f} = ${min_cost:.2f}")
+        logger.info(f"[DATA] Trade details: {shares} {side} shares @ ${entry_price:.2f} = ${min_cost:.2f}")
         
         # Calculate proper stop-loss levels using Grok4 recommendations
         from src.utils.stop_loss_calculator import StopLossCalculator
@@ -1131,7 +1131,7 @@ async def _evaluate_immediate_trade(
             target_confidence_change=exit_levels['target_confidence_change']
         )
         
-        # 🚨 VALIDATE MARKET IS STILL TRADEABLE before executing
+        # [ALERT] VALIDATE MARKET IS STILL TRADEABLE before executing
         try:
             market_data = await kalshi_client.get_market(opportunity.market_id)
             
@@ -1141,7 +1141,7 @@ async def _evaluate_immediate_trade(
             yes_ask = market_info.get('yes_ask', 0)
             no_ask = market_info.get('no_ask', 0)
             
-            logger.info(f"🔍 Market validation for {opportunity.market_id}: status={market_status}, YES={yes_ask}¢, NO={no_ask}¢")
+            logger.info(f"[SEARCH] Market validation for {opportunity.market_id}: status={market_status}, YES={yes_ask}¢, NO={no_ask}¢")
             
             # FIXED: Kalshi uses 'active' for tradeable markets, not 'open'
             if market_status not in ['active', 'open']:
@@ -1152,7 +1152,7 @@ async def _evaluate_immediate_trade(
                 logger.warning(f"⏭️ Skipping {opportunity.market_id} - No valid prices (YES={yes_ask}¢, NO={no_ask}¢)")
                 return
                 
-            logger.info(f"✅ Market validation passed for {opportunity.market_id} - Status: {market_status}, proceeding with trade!")
+            logger.info(f"[OK] Market validation passed for {opportunity.market_id} - Status: {market_status}, proceeding with trade!")
             
         except Exception as e:
             logger.error(f"⏭️ Skipping {opportunity.market_id} - Market validation failed: {e}")
@@ -1170,9 +1170,9 @@ async def _evaluate_immediate_trade(
             live_mode = getattr(settings.trading, 'live_trading_enabled', False)
             success = await execute_position(position, live_mode, db_manager, kalshi_client)
             if success:
-                logger.info(f"✅ IMMEDIATE TRADE EXECUTED: {opportunity.market_id} - ${position_size:.0f} position")
+                logger.info(f"[OK] IMMEDIATE TRADE EXECUTED: {opportunity.market_id} - ${position_size:.0f} position")
             else:
-                logger.error(f"❌ IMMEDIATE TRADE FAILED: {opportunity.market_id}")
+                logger.error(f"[FAIL] IMMEDIATE TRADE FAILED: {opportunity.market_id}")
         
     except Exception as e:
         logger.error(f"Error in immediate trade evaluation for {opportunity.market_id}: {e}")

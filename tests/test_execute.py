@@ -165,7 +165,7 @@ async def test_profit_taking_orders():
             profit_threshold=0.15  # 15% profit threshold for testing
         )
         
-        print(f"📊 Profit-taking test results:")
+        print(f"[DATA] Profit-taking test results:")
         print(f"   Positions processed: {results['positions_processed']}")
         print(f"   Orders placed: {results['orders_placed']}")
         
@@ -174,7 +174,7 @@ async def test_profit_taking_orders():
         assert 'orders_placed' in results, "Should include orders_placed count"
         assert 'positions_processed' in results, "Should include positions_processed count"
         
-        print("✅ Profit-taking orders test completed successfully")
+        print("[OK] Profit-taking orders test completed successfully")
         
     finally:
         # Cleanup

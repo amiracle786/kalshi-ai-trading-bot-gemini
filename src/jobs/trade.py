@@ -1,5 +1,5 @@
 """
-Enhanced Trading Job - Beast Mode 🚀
+Enhanced Trading Job - Beast Mode [START]
 
 This job now uses the Unified Advanced Trading System that orchestrates:
 1. Market Making Strategy (40% allocation)
@@ -55,12 +55,23 @@ async def run_trading_job() -> Optional[TradingSystemResults]:
     logger = get_trading_logger("trading_job")
     
     try:
-        logger.info("🚀 Starting Enhanced Trading Job - Beast Mode Activated!")
+        logger.info("[START] Starting Enhanced Trading Job - Beast Mode Activated!")
         
         # Initialize clients
         db_manager = DatabaseManager()
         kalshi_client = KalshiClient()
-        xai_client = XAIClient(db_manager=db_manager)  # Pass db_manager for LLM logging
+
+        # Initialize XAI client if API key is available, otherwise None
+        xai_client = None
+        try:
+            import os
+            if os.getenv("XAI_API_KEY"):
+                xai_client = XAIClient(db_manager=db_manager)  # Pass db_manager for LLM logging
+                logger.info("XAI client initialized")
+            else:
+                logger.info("XAI_API_KEY not set - using OpenRouter only for trading decisions")
+        except Exception as e:
+            logger.warning(f"Failed to initialize XAI client: {e} - using OpenRouter only")
         
         # Configure the unified system
         # Use default settings unless overridden
@@ -87,31 +98,31 @@ async def run_trading_job() -> Optional[TradingSystemResults]:
         )
         
         # Execute the unified trading system
-        logger.info("🎯 Executing Unified Advanced Trading System")
+        logger.info("[EXEC] Executing Unified Advanced Trading System")
         results = await run_unified_trading_system(
             db_manager, kalshi_client, xai_client, config
         )
-        
+
         # Log comprehensive results
         if results.total_positions > 0:
             logger.info(
-                f"✅ TRADING JOB COMPLETE - BEAST MODE RESULTS:\n"
-                f"📊 PERFORMANCE:\n"
+                f"[RESULT] TRADING JOB COMPLETE - BEAST MODE RESULTS:\n"
+                f"[PERF] PERFORMANCE:\n"
                 f"  • Total Positions: {results.total_positions}\n"
                 f"  • Capital Used: ${results.total_capital_used:.0f} ({results.capital_efficiency:.1%})\n"
                 f"  • Expected Annual Return: {results.expected_annual_return:.1%}\n"
                 f"  • Portfolio Sharpe Ratio: {results.portfolio_sharpe_ratio:.2f}\n"
                 f"  • Portfolio Volatility: {results.portfolio_volatility:.1%}\n"
                 f"\n"
-                f"💰 STRATEGIES:\n"
+                f"[STRATEGIES]\n"
                 f"  • Market Making: {results.market_making_orders} orders, ${results.market_making_expected_profit:.2f} profit\n"
                 f"  • Directional: {results.directional_positions} positions, ${results.directional_expected_return:.2f} return\n"
                 f"\n"
-                f"⚡ SYSTEM STATUS: MAXIMUM CAPITAL EFFICIENCY ACHIEVED!"
+                f"[STATUS] MAXIMUM CAPITAL EFFICIENCY ACHIEVED!"
             )
         else:
             logger.info(
-                f"📊 Trading job complete - no new positions created this cycle\n"
+                f"[RESULT] Trading job complete - no new positions created this cycle\n"
                 f"   Reasons: Market conditions, risk limits, or insufficient opportunities"
             )
         
@@ -120,7 +131,7 @@ async def run_trading_job() -> Optional[TradingSystemResults]:
     except Exception as e:
         logger.error(f"Error in enhanced trading job: {e}")
         # Fallback to legacy system if unified system fails
-        logger.warning("🔄 Falling back to legacy decision-making system")
+        logger.warning("[FALLBACK] Falling back to legacy decision-making system")
         return await _fallback_legacy_trading()
 
 
@@ -131,12 +142,25 @@ async def _fallback_legacy_trading() -> Optional[TradingSystemResults]:
     logger = get_trading_logger("trading_job_fallback")
     
     try:
-        logger.info("🔄 Executing fallback legacy trading system")
+        logger.info("[FALLBACK] Executing fallback legacy trading system")
         
         # Initialize components
         db_manager = DatabaseManager()
         kalshi_client = KalshiClient()
-        xai_client = XAIClient()
+
+        # Initialize XAI client if API key is available, otherwise None
+        xai_client = None
+        try:
+            import os
+            if os.getenv("XAI_API_KEY"):
+                xai_client = XAIClient()
+                logger.info("XAI client initialized")
+            else:
+                logger.info("XAI_API_KEY not set - skipping legacy trading (using main system instead)")
+                return TradingSystemResults()
+        except Exception as e:
+            logger.warning(f"Failed to initialize XAI client: {e} - skipping fallback system")
+            return TradingSystemResults()
         
         # Get eligible markets
         markets = await db_manager.get_eligible_markets(
@@ -164,7 +188,7 @@ async def _fallback_legacy_trading() -> Optional[TradingSystemResults]:
                     if success:
                         positions_created += 1
                         total_exposure += position.entry_price * position.quantity
-                        logger.info(f"✅ Legacy: Created position for {market.market_id}")
+                        logger.info(f"[SUCCESS] Legacy: Created position for {market.market_id}")
                 
             except Exception as e:
                 logger.error(f"Error processing market {market.market_id}: {e}")
@@ -188,5 +212,5 @@ async def _fallback_legacy_trading() -> Optional[TradingSystemResults]:
 async def run_legacy_trading():
     """Legacy entry point - redirects to enhanced system."""
     logger = get_trading_logger("legacy_redirect")
-    logger.info("🔄 Legacy trading call redirected to enhanced system")
+    logger.info("[CYCLE] Legacy trading call redirected to enhanced system")
     return await run_trading_job() 

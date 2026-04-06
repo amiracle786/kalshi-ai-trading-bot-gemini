@@ -51,7 +51,7 @@ class PerformanceScheduler:
         
     def start(self) -> None:
         """Start the automated scheduler."""
-        self.logger.info("🚀 Starting Performance Analysis Scheduler")
+        self.logger.info("[START] Starting Performance Analysis Scheduler")
         
         # Schedule daily analysis
         schedule.every().day.at(self.config.daily_analysis_time).do(self._run_daily_analysis)
@@ -79,7 +79,7 @@ class PerformanceScheduler:
     
     def stop(self) -> None:
         """Stop the scheduler."""
-        self.logger.info("🛑 Stopping Performance Analysis Scheduler")
+        self.logger.info("[STOP] Stopping Performance Analysis Scheduler")
         self.running = False
         schedule.clear()
     
@@ -91,7 +91,7 @@ class PerformanceScheduler:
     
     async def _run_initial_analysis(self) -> None:
         """Run initial analysis on startup."""
-        self.logger.info("🔍 Running initial performance analysis")
+        self.logger.info("[SEARCH] Running initial performance analysis")
         try:
             report = await run_performance_analysis()
             self.last_analysis = report
@@ -102,17 +102,17 @@ class PerformanceScheduler:
                 await self._handle_critical_alert(report, "Initial Analysis")
             
             self.logger.info(
-                "✅ Initial analysis completed",
+                "[OK] Initial analysis completed",
                 health_score=self.last_health_score,
                 critical_issues=report['summary']['total_critical_issues']
             )
             
         except Exception as e:
-            self.logger.error(f"❌ Initial analysis failed: {e}")
+            self.logger.error(f"[FAIL] Initial analysis failed: {e}")
     
     def _run_daily_analysis(self) -> None:
         """Run daily performance analysis."""
-        self.logger.info("📊 Running scheduled daily analysis")
+        self.logger.info("[DATA] Running scheduled daily analysis")
         asyncio.create_task(self._execute_daily_analysis())
     
     async def _execute_daily_analysis(self) -> None:
@@ -126,7 +126,7 @@ class PerformanceScheduler:
             health_change = current_health - self.last_health_score
             
             self.logger.info(
-                "📈 Daily analysis completed",
+                "[UP] Daily analysis completed",
                 health_score=current_health,
                 health_change=health_change,
                 critical_issues=report['summary']['total_critical_issues'],
@@ -147,7 +147,7 @@ class PerformanceScheduler:
             await self._save_daily_summary(report)
             
         except Exception as e:
-            self.logger.error(f"❌ Daily analysis failed: {e}")
+            self.logger.error(f"[FAIL] Daily analysis failed: {e}")
             await self._handle_analysis_failure("Daily Analysis", e)
     
     def _run_weekly_analysis(self) -> None:
@@ -165,7 +165,7 @@ class PerformanceScheduler:
             weekly_report = await self._generate_weekly_report(report)
             
             self.logger.info(
-                "📊 Weekly analysis completed",
+                "[DATA] Weekly analysis completed",
                 health_score=report['summary']['overall_health_score'],
                 total_action_items=len(report['action_items'])
             )
@@ -177,7 +177,7 @@ class PerformanceScheduler:
             await self._send_weekly_summary(weekly_report)
             
         except Exception as e:
-            self.logger.error(f"❌ Weekly analysis failed: {e}")
+            self.logger.error(f"[FAIL] Weekly analysis failed: {e}")
             await self._handle_analysis_failure("Weekly Analysis", e)
     
     def _check_critical_issues(self) -> None:
@@ -196,7 +196,7 @@ class PerformanceScheduler:
         # Check if we have new critical issues (would require new analysis)
         if critical_count > 0:
             self.logger.warning(
-                f"⚠️ Ongoing critical issues detected: {critical_count}",
+                f"[WARNING] Ongoing critical issues detected: {critical_count}",
                 health_score=health_score
             )
     
@@ -206,7 +206,7 @@ class PerformanceScheduler:
         health_score = report['summary']['overall_health_score']
         
         alert_message = f"""
-🚨 CRITICAL TRADING SYSTEM ALERT
+[ALERT] CRITICAL TRADING SYSTEM ALERT
 
 Analysis Type: {analysis_type}
 Timestamp: {datetime.now().isoformat()}
@@ -241,7 +241,7 @@ Full report saved to: {report.get('report_file', 'database')}
         await self._send_alert(alert_message, "CRITICAL", report)
         
         self.logger.error(
-            "🚨 Critical alert sent",
+            "[ALERT] Critical alert sent",
             analysis_type=analysis_type,
             critical_issues=critical_issues,
             health_score=health_score
@@ -250,7 +250,7 @@ Full report saved to: {report.get('report_file', 'database')}
     async def _handle_health_degradation_alert(self, report: Dict[str, Any], health_change: float) -> None:
         """Handle health score degradation alerts."""
         alert_message = f"""
-⚠️ TRADING SYSTEM HEALTH DEGRADATION
+[WARNING] TRADING SYSTEM HEALTH DEGRADATION
 
 Timestamp: {datetime.now().isoformat()}
 Health Score Change: {health_change:+.1f} points
@@ -263,7 +263,7 @@ Review the latest analysis report for specific recommendations.
         await self._send_alert(alert_message, "WARNING", report)
         
         self.logger.warning(
-            "⚠️ Health degradation alert sent",
+            "[WARNING] Health degradation alert sent",
             health_change=health_change,
             current_score=report['summary']['overall_health_score']
         )
@@ -291,7 +291,7 @@ Consider reducing exposure and addressing outstanding issues.
     async def _handle_analysis_failure(self, analysis_type: str, error: Exception) -> None:
         """Handle analysis failures."""
         alert_message = f"""
-❌ ANALYSIS SYSTEM FAILURE
+[FAIL] ANALYSIS SYSTEM FAILURE
 
 Analysis Type: {analysis_type}
 Timestamp: {datetime.now().isoformat()}
@@ -304,7 +304,7 @@ Manual monitoring may be required until the issue is resolved.
         await self._send_alert(alert_message, "SYSTEM_ERROR")
         
         self.logger.error(
-            "❌ Analysis failure alert sent",
+            "[FAIL] Analysis failure alert sent",
             analysis_type=analysis_type,
             error=str(error)
         )
@@ -375,7 +375,7 @@ Manual monitoring may be required until the issue is resolved.
     async def _send_weekly_summary(self, weekly_report: Dict[str, Any]) -> None:
         """Send weekly summary notification."""
         summary_message = f"""
-📊 WEEKLY TRADING SYSTEM SUMMARY
+[DATA] WEEKLY TRADING SYSTEM SUMMARY
 
 Week Ending: {datetime.now().strftime('%Y-%m-%d')}
 Health Score: {weekly_report['summary']['health_score']:.1f}/100
@@ -481,7 +481,7 @@ if __name__ == "__main__":
         )
         
         scheduler = start_performance_scheduler(config)
-        print("🚀 Performance scheduler started")
+        print("[START] Performance scheduler started")
         print(f"Daily analysis: {args.daily_time}")
         print(f"Weekly analysis: {args.weekly_day}")
         print("Press Ctrl+C to stop")
@@ -490,13 +490,13 @@ if __name__ == "__main__":
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print("\n🛑 Stopping scheduler...")
+            print("\n[STOP] Stopping scheduler...")
             stop_performance_scheduler()
-            print("✅ Scheduler stopped")
+            print("[OK] Scheduler stopped")
     
     elif args.status:
         status = get_scheduler_status()
-        print("📊 SCHEDULER STATUS")
+        print("[DATA] SCHEDULER STATUS")
         print(f"Running: {status['running']}")
         print(f"Last Analysis: {status['last_analysis']}")
         print(f"Last Health Score: {status.get('last_health_score', 'N/A')}")

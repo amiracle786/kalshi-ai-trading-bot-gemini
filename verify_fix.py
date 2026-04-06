@@ -33,9 +33,9 @@ def simulate_cli_live_flag():
     print(f"Strategy sees live_mode: {strategy_live_mode}")
     
     if strategy_live_mode:
-        print("✅ SUCCESS: Strategies will place LIVE orders!")
+        print("[OK] SUCCESS: Strategies will place LIVE orders!")
     else:
-        print("❌ FAILURE: Strategies will place PAPER orders!")
+        print("[FAIL] FAILURE: Strategies will place PAPER orders!")
     
     return strategy_live_mode
 
@@ -70,9 +70,9 @@ def simulate_cli_paper_flag():
     print(f"Strategy sees live_mode: {strategy_live_mode}")
     
     if not strategy_live_mode:
-        print("✅ SUCCESS: Strategies will place PAPER orders!")
+        print("[OK] SUCCESS: Strategies will place PAPER orders!")
     else:
-        print("❌ FAILURE: Strategies will place LIVE orders!")
+        print("[FAIL] FAILURE: Strategies will place LIVE orders!")
     
     return strategy_live_mode
 
@@ -94,12 +94,12 @@ def main():
     
     if success:
         print("🎉 ALL TESTS PASSED! The live trading fix works correctly.")
-        print("✅ --live flag correctly activates live trading")
-        print("✅ --paper flag correctly activates paper trading")
-        print("✅ Strategies will receive the correct mode")
+        print("[OK] --live flag correctly activates live trading")
+        print("[OK] --paper flag correctly activates paper trading")
+        print("[OK] Strategies will receive the correct mode")
         print("\nThe bot will now place real orders when using --live flag!")
     else:
-        print("❌ TESTS FAILED! The fix needs more work.")
+        print("[FAIL] TESTS FAILED! The fix needs more work.")
         print(f"Live mode test: {'PASS' if live_result else 'FAIL'}")
         print(f"Paper mode test: {'PASS' if not paper_result else 'FAIL'}")
     

@@ -94,7 +94,7 @@ async def get_portfolio_health() -> Dict:
 def print_portfolio_summary(health: Dict):
     """Print a formatted portfolio summary."""
     
-    print("💰 PORTFOLIO HEALTH CHECK")
+    print("[MONEY] PORTFOLIO HEALTH CHECK")
     print("=" * 50)
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
@@ -102,17 +102,17 @@ def print_portfolio_summary(health: Dict):
     # Financial overview
     print("💵 FINANCIAL OVERVIEW")
     print("-" * 30)
-    print(f"💰 Total Portfolio Value:  ${health['total_portfolio_value']:.2f}")
+    print(f"[MONEY] Total Portfolio Value:  ${health['total_portfolio_value']:.2f}")
     print(f"💵 Available Cash:         ${health['available_cash']:.2f}")
-    print(f"📊 Position Value:         ${health['position_value']:.2f}")
+    print(f"[DATA] Position Value:         ${health['position_value']:.2f}")
     print()
     
     # Utilization metrics
-    print("📈 UTILIZATION METRICS")
+    print("[UP] UTILIZATION METRICS")
     print("-" * 30)
-    print(f"📊 Portfolio Utilization:  {health['utilization_pct']:.1f}%")
+    print(f"[DATA] Portfolio Utilization:  {health['utilization_pct']:.1f}%")
     print(f"💸 Cash Reserve:           {health['cash_pct']:.1f}%")
-    print(f"🎯 Active Positions:       {health['positions_count']}")
+    print(f"[TARGET] Active Positions:       {health['positions_count']}")
     print()
     
     # Health indicators
@@ -140,10 +140,10 @@ def print_position_details(health: Dict):
     """Print detailed position information."""
     
     if not health['position_details']:
-        print("📊 No active positions")
+        print("[DATA] No active positions")
         return
     
-    print("📊 POSITION DETAILS")
+    print("[DATA] POSITION DETAILS")
     print("-" * 80)
     print(f"{'Ticker':<25} {'Side':<4} {'Contracts':<10} {'Price':<8} {'Value':<10} {'Market':<20}")
     print("-" * 80)
@@ -163,14 +163,14 @@ def print_position_details(health: Dict):
 async def main():
     """Main function."""
     try:
-        print("🔍 Analyzing portfolio...")
+        print("[SEARCH] Analyzing portfolio...")
         health = await get_portfolio_health()
         
         print_portfolio_summary(health)
         print_position_details(health)
         
         # Trading recommendations
-        print("💡 TRADING RECOMMENDATIONS")
+        print("[IDEA] TRADING RECOMMENDATIONS")
         print("-" * 40)
         
         if health['cash_pct'] < 15:
@@ -187,10 +187,10 @@ async def main():
         if max_position and max_position['value'] > health['total_portfolio_value'] * 0.15:
             print(f"• Large position risk: {max_position['ticker']} is {(max_position['value']/health['total_portfolio_value']*100):.1f}% of portfolio")
         
-        print(f"\n🚀 Ready for dashboard! Run: python launch_dashboard.py")
+        print(f"\n[START] Ready for dashboard! Run: python launch_dashboard.py")
         
     except Exception as e:
-        print(f"❌ Error analyzing portfolio: {e}")
+        print(f"[FAIL] Error analyzing portfolio: {e}")
         import traceback
         traceback.print_exc()
 

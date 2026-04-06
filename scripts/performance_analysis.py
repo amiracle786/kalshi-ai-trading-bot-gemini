@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 async def comprehensive_analysis():
     """Comprehensive analysis of trading performance and system state."""
     
-    print("🎯 KALSHI TRADING SYSTEM PERFORMANCE ANALYSIS")
+    print("[TARGET] KALSHI TRADING SYSTEM PERFORMANCE ANALYSIS")
     print("=" * 60)
     
     kalshi_client = KalshiClient()
@@ -21,7 +21,7 @@ async def comprehensive_analysis():
     
     try:
         # 1. CURRENT POSITIONS ANALYSIS
-        print("\n📊 CURRENT POSITIONS ANALYSIS")
+        print("\n[DATA] CURRENT POSITIONS ANALYSIS")
         print("-" * 40)
         
         # Kalshi actual positions
@@ -31,8 +31,8 @@ async def comprehensive_analysis():
         non_zero_positions = [p for p in kalshi_positions if p.get('position', 0) != 0]
         total_contracts = sum(abs(p.get('position', 0)) for p in non_zero_positions)
         
-        print(f"✅ Active Kalshi Positions: {len(non_zero_positions)} markets")
-        print(f"📈 Total Contracts Held: {total_contracts}")
+        print(f"[OK] Active Kalshi Positions: {len(non_zero_positions)} markets")
+        print(f"[UP] Total Contracts Held: {total_contracts}")
         
         if non_zero_positions:
             print("\nTop Positions:")
@@ -72,7 +72,7 @@ async def comprehensive_analysis():
             print(f"Non-live positions: {len(non_live_positions)}")
         
         # 3. BALANCE AND CAPITAL ANALYSIS
-        print(f"\n💰 CAPITAL ANALYSIS")
+        print(f"\n[MONEY] CAPITAL ANALYSIS")
         print("-" * 40)
         
         balance_response = await kalshi_client.get_balance()
@@ -105,7 +105,7 @@ async def comprehensive_analysis():
         print(f"Capital Utilization: {(total_position_value/total_portfolio_value)*100:.1f}%")
         
         # 4. RECENT TRADING ACTIVITY
-        print(f"\n📈 RECENT TRADING ACTIVITY")
+        print(f"\n[UP] RECENT TRADING ACTIVITY")
         print("-" * 40)
         
         # Look at recent logs for trading decisions
@@ -147,25 +147,25 @@ async def comprehensive_analysis():
                 
                 if kalshi_quantity != expected_quantity:
                     discrepancies += 1
-                    print(f"⚠️  {market_id}: DB={expected_quantity}, Kalshi={kalshi_quantity}")
+                    print(f"[WARNING]  {market_id}: DB={expected_quantity}, Kalshi={kalshi_quantity}")
         
         if discrepancies == 0:
-            print("✅ All database positions match Kalshi positions")
+            print("[OK] All database positions match Kalshi positions")
         else:
-            print(f"❌ Found {discrepancies} position discrepancies")
+            print(f"[FAIL] Found {discrepancies} position discrepancies")
         
         # 6. TRADING RECOMMENDATIONS
-        print(f"\n🎯 TRADING SYSTEM ASSESSMENT")
+        print(f"\n[TARGET] TRADING SYSTEM ASSESSMENT")
         print("-" * 40)
         
         if len(non_zero_positions) == 0:
-            print("🔍 Status: NO ACTIVE POSITIONS - System may be too conservative")
-            print("💡 Suggestion: Check eligibility filters and confidence thresholds")
+            print("[SEARCH] Status: NO ACTIVE POSITIONS - System may be too conservative")
+            print("[IDEA] Suggestion: Check eligibility filters and confidence thresholds")
         elif len(non_zero_positions) < 5:
-            print("📊 Status: LOW ACTIVITY - Conservative trading approach")
-            print("💡 Suggestion: Consider expanding eligibility criteria")
+            print("[DATA] Status: LOW ACTIVITY - Conservative trading approach")
+            print("[IDEA] Suggestion: Consider expanding eligibility criteria")
         else:
-            print("🚀 Status: ACTIVE TRADING - Good position diversification")
+            print("[START] Status: ACTIVE TRADING - Good position diversification")
             
         # Calculate win rate if we have trade logs
         try:
@@ -175,14 +175,14 @@ async def comprehensive_analysis():
                 win_rate = win_rate_result[0] if win_rate_result and win_rate_result[0] is not None else None
                 
                 if win_rate is not None:
-                    print(f"📈 Historical Win Rate: {win_rate:.1%}")
+                    print(f"[UP] Historical Win Rate: {win_rate:.1%}")
                     if win_rate < 0.4:
-                        print("⚠️  Low win rate - consider adjusting strategy")
+                        print("[WARNING]  Low win rate - consider adjusting strategy")
                     elif win_rate > 0.6:
-                        print("✅ Strong win rate - system performing well")
+                        print("[OK] Strong win rate - system performing well")
                         
         except Exception as e:
-            print("📊 Win rate data not available yet")
+            print("[DATA] Win rate data not available yet")
             
     finally:
         await kalshi_client.close()

@@ -37,26 +37,26 @@ async def sync_positions_to_database():
     try:
         await db_manager.initialize()
         
-        print("🔄 Syncing positions from Kalshi to database...")
+        print("[CYCLE] Syncing positions from Kalshi to database...")
         
         # Get current Kalshi positions
         positions_response = await kalshi_client.get_positions()
         market_positions = positions_response.get('market_positions', [])
         
-        print(f"📊 Found {len(market_positions)} positions on Kalshi")
+        print(f"[DATA] Found {len(market_positions)} positions on Kalshi")
         
         # Get current database positions
         db_positions = await db_manager.get_open_positions()
         print(f"💾 Found {len(db_positions)} open positions in database")
         
         # Clear ALL existing positions from database to avoid conflicts
-        print("🔄 Deleting all existing database positions...")
+        print("[CYCLE] Deleting all existing database positions...")
         import aiosqlite
         async with aiosqlite.connect(db_manager.db_path) as db:
             # Delete ALL positions to avoid unique constraint conflicts
             await db.execute("DELETE FROM positions")
             await db.commit()
-            print(f"   ✅ Deleted all old positions from database")
+            print(f"   [OK] Deleted all old positions from database")
         
         # Add current Kalshi positions to database
         active_positions = 0
@@ -105,17 +105,17 @@ async def sync_positions_to_database():
                         print(f"   ➕ Added {ticker}: {side} {abs(position_count)} @ ${current_price:.2f} = ${position_value:.2f}")
                         
                 except Exception as e:
-                    print(f"   ❌ Error syncing {ticker}: {e}")
+                    print(f"   [FAIL] Error syncing {ticker}: {e}")
         
-        print(f"\n✅ Sync complete!")
-        print(f"📊 Active positions: {active_positions}")
-        print(f"💰 Total position value: ${total_value:.2f}")
-        print(f"🚀 Dashboard should now show accurate data!")
+        print(f"\n[OK] Sync complete!")
+        print(f"[DATA] Active positions: {active_positions}")
+        print(f"[MONEY] Total position value: ${total_value:.2f}")
+        print(f"[START] Dashboard should now show accurate data!")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error syncing positions: {e}")
+        print(f"[FAIL] Error syncing positions: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -158,7 +158,7 @@ async def close_database_position(db_manager: DatabaseManager, position: Positio
 async def verify_sync():
     """Verify the sync worked correctly."""
     
-    print("\n🔍 Verifying sync results...")
+    print("\n[SEARCH] Verifying sync results...")
     
     kalshi_client = KalshiClient()
     db_manager = DatabaseManager()
@@ -174,16 +174,16 @@ async def verify_sync():
         # Get database positions
         db_positions = await db_manager.get_open_positions()
         
-        print(f"📊 Kalshi active positions: {kalshi_active}")
+        print(f"[DATA] Kalshi active positions: {kalshi_active}")
         print(f"💾 Database open positions: {len(db_positions)}")
         
         if kalshi_active == len(db_positions):
-            print("✅ Sync successful - counts match!")
+            print("[OK] Sync successful - counts match!")
         else:
-            print("⚠️ Counts don't match - may need to run sync again")
+            print("[WARNING] Counts don't match - may need to run sync again")
             
     except Exception as e:
-        print(f"❌ Error verifying sync: {e}")
+        print(f"[FAIL] Error verifying sync: {e}")
         
     finally:
         await kalshi_client.close()
@@ -193,7 +193,7 @@ async def verify_sync():
 async def main():
     """Main function."""
     
-    print("🔄 Position Database Sync Tool")
+    print("[CYCLE] Position Database Sync Tool")
     print("=" * 50)
     print("This will sync your current Kalshi positions into the database")
     print("so the dashboard shows accurate trade counts and P&L data.")
@@ -205,10 +205,10 @@ async def main():
     if success:
         await verify_sync()
         print("\n🎉 Position sync complete!")
-        print("📊 Refresh your dashboard to see updated data")
-        print("🚀 Run: python launch_dashboard.py")
+        print("[DATA] Refresh your dashboard to see updated data")
+        print("[START] Run: python launch_dashboard.py")
     else:
-        print("\n❌ Sync failed - check errors above")
+        print("\n[FAIL] Sync failed - check errors above")
 
 
 if __name__ == "__main__":

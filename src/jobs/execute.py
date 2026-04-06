@@ -32,11 +32,11 @@ async def execute_position(
         True if execution was successful, False otherwise.
     """
     logger = get_trading_logger("trade_execution")
-    logger.info(f"🎯 Executing position for market: {position.market_id}")
-    logger.info(f"🎛️ Live mode: {live_mode}")
+    logger.info(f"[TARGET] Executing position for market: {position.market_id}")
+    logger.info(f"[MODE] Live mode: {live_mode}")
     
     if live_mode:
-        logger.warning(f"💰 PLACING LIVE ORDER - Real money will be used for {position.market_id}")
+        logger.warning(f"[MONEY] PLACING LIVE ORDER - Real money will be used for {position.market_id}")
         try:
             # Get current market prices to determine the appropriate price field
             market_data = await kalshi_client.get_market(position.market_id)
@@ -83,18 +83,18 @@ async def execute_position(
             fill_price = position.entry_price
 
             await db_manager.update_position_to_live(position.id, fill_price)
-            logger.info(f"✅ LIVE ORDER PLACED for {position.market_id}. Order ID: {order_response.get('order', {}).get('order_id')}")
-            logger.info(f"💰 Real money used: ${position.quantity * fill_price:.2f}")
+            logger.info(f"[OK] LIVE ORDER PLACED for {position.market_id}. Order ID: {order_response.get('order', {}).get('order_id')}")
+            logger.info(f"[MONEY] Real money used: ${position.quantity * fill_price:.2f}")
             return True
 
         except KalshiAPIError as e:
-            logger.error(f"❌ FAILED to place LIVE order for {position.market_id}: {e}")
+            logger.error(f"[FAIL] FAILED to place LIVE order for {position.market_id}: {e}")
             return False
     else:
         # Simulate the trade
         await db_manager.update_position_to_live(position.id, position.entry_price)
-        logger.info(f"📝 PAPER TRADE SIMULATED for {position.market_id} - No real money used")
-        logger.info(f"📊 Would have used: ${position.quantity * position.entry_price:.2f}")
+        logger.info(f"[NOTE] PAPER TRADE SIMULATED for {position.market_id} - No real money used")
+        logger.info(f"[DATA] Would have used: ${position.quantity * position.entry_price:.2f}")
         return True
 
 
@@ -145,7 +145,7 @@ async def place_sell_limit_order(
         else:
             order_params["no_price"] = limit_price_cents
         
-        logger.info(f"🎯 Placing SELL LIMIT order: {position.quantity} {side.upper()} at {limit_price_cents}¢ for {position.market_id}")
+        logger.info(f"[TARGET] Placing SELL LIMIT order: {position.quantity} {side.upper()} at {limit_price_cents}¢ for {position.market_id}")
         
         # Place the sell limit order
         response = await kalshi_client.place_order(**order_params)
@@ -154,7 +154,7 @@ async def place_sell_limit_order(
             order_id = response['order'].get('order_id', client_order_id)
             
             # Record the sell order in the database (we could add a sell_orders table if needed)
-            logger.info(f"✅ SELL LIMIT ORDER placed successfully! Order ID: {order_id}")
+            logger.info(f"[OK] SELL LIMIT ORDER placed successfully! Order ID: {order_id}")
             logger.info(f"   Market: {position.market_id}")
             logger.info(f"   Side: {side.upper()} (selling {position.quantity} shares)")
             logger.info(f"   Limit Price: {limit_price_cents}¢")
@@ -162,11 +162,11 @@ async def place_sell_limit_order(
             
             return True
         else:
-            logger.error(f"❌ Failed to place sell limit order: {response}")
+            logger.error(f"[FAIL] Failed to place sell limit order: {response}")
             return False
             
     except Exception as e:
-        logger.error(f"❌ Error placing sell limit order for {position.market_id}: {e}")
+        logger.error(f"[FAIL] Error placing sell limit order for {position.market_id}: {e}")
         return False
 
 
@@ -198,7 +198,7 @@ async def place_profit_taking_orders(
             logger.info("No open positions to process for profit taking")
             return results
         
-        logger.info(f"📊 Checking {len(positions)} positions for profit-taking opportunities")
+        logger.info(f"[DATA] Checking {len(positions)} positions for profit-taking opportunities")
         
         for position in positions:
             try:
@@ -230,7 +230,7 @@ async def place_profit_taking_orders(
                         # Calculate sell limit price (slightly below current to ensure execution)
                         sell_price = current_price * 0.98  # 2% below current price for quick execution
                         
-                        logger.info(f"💰 PROFIT TARGET HIT: {position.market_id} - {profit_pct:.1%} profit (${unrealized_pnl:.2f})")
+                        logger.info(f"[MONEY] PROFIT TARGET HIT: {position.market_id} - {profit_pct:.1%} profit (${unrealized_pnl:.2f})")
                         
                         # Place sell limit order
                         success = await place_sell_limit_order(
@@ -242,15 +242,15 @@ async def place_profit_taking_orders(
                         
                         if success:
                             results['orders_placed'] += 1
-                            logger.info(f"✅ Profit-taking order placed for {position.market_id}")
+                            logger.info(f"[OK] Profit-taking order placed for {position.market_id}")
                         else:
-                            logger.error(f"❌ Failed to place profit-taking order for {position.market_id}")
+                            logger.error(f"[FAIL] Failed to place profit-taking order for {position.market_id}")
                 
             except Exception as e:
                 logger.error(f"Error processing position {position.market_id} for profit taking: {e}")
                 continue
         
-        logger.info(f"🎯 Profit-taking summary: {results['orders_placed']} orders placed from {results['positions_processed']} positions")
+        logger.info(f"[TARGET] Profit-taking summary: {results['orders_placed']} orders placed from {results['positions_processed']} positions")
         return results
         
     except Exception as e:
@@ -329,9 +329,9 @@ async def place_stop_loss_orders(
                         
                         if success:
                             results['orders_placed'] += 1
-                            logger.info(f"✅ Stop-loss order placed for {position.market_id}")
+                            logger.info(f"[OK] Stop-loss order placed for {position.market_id}")
                         else:
-                            logger.error(f"❌ Failed to place stop-loss order for {position.market_id}")
+                            logger.error(f"[FAIL] Failed to place stop-loss order for {position.market_id}")
                 
             except Exception as e:
                 logger.error(f"Error processing position {position.market_id} for stop loss: {e}")

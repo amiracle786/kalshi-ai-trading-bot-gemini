@@ -947,7 +947,7 @@ Required format:
                 asyncio.create_task(self._persist_cost_to_db(cost))
 
                 self.logger.info(
-                    f"✅ Fallback model {fallback_model} succeeded",
+                    f"[OK] Fallback model {fallback_model} succeeded",
                     response_length=len(response_content),
                     estimated_tokens=estimated_tokens,
                     cost=cost

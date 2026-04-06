@@ -188,7 +188,7 @@ class PositionLimitsManager:
                     # Close the position
                     await self._close_position(candidate)
                     closed_positions.append(candidate.market_id)
-                    self.logger.info(f"✅ CLOSED POSITION: {candidate.market_id} (Priority: {candidate.priority_score:.2f})")
+                    self.logger.info(f"[OK] CLOSED POSITION: {candidate.market_id} (Priority: {candidate.priority_score:.2f})")
                 except Exception as e:
                     self.logger.error(f"Failed to close position {candidate.market_id}: {e}")
             

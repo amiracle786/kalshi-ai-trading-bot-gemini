@@ -363,7 +363,7 @@ class CategoryScorer:
     def score_label(self, score: float) -> str:
         """Human-readable label for a score."""
         if score >= 80:
-            return "STRONG ✅"
+            return "STRONG [OK]"
         elif score >= 60:
             return "GOOD 🟢"
         elif score >= 40:

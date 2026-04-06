@@ -61,7 +61,7 @@ async def get_cost_summary(db_manager: DatabaseManager, days: int = 1) -> dict:
 
 def print_cost_report(summary: dict, days: int):
     """Print formatted cost report."""
-    print(f"\n💰 AI Cost Report - Last {days} day(s)")
+    print(f"\n[MONEY] AI Cost Report - Last {days} day(s)")
     print("=" * 50)
     
     if summary['totals'] and summary['totals'][0]:
@@ -69,7 +69,7 @@ def print_cost_report(summary: dict, days: int):
         total_analyses = summary['totals'][1] or 0
         total_decisions = summary['totals'][2] or 0
         
-        print(f"📊 Summary:")
+        print(f"[DATA] Summary:")
         print(f"   Total Cost: ${total_cost:.3f}")
         print(f"   Total Analyses: {total_analyses}")
         print(f"   Total Decisions: {total_decisions}")
@@ -85,7 +85,7 @@ def print_cost_report(summary: dict, days: int):
                 status = "🟢" if budget_used < 0.5 else "🟡" if budget_used < 0.8 else "🔴"
                 print(f"\n{status} Today's Budget: ${today_cost:.3f} / ${summary['budget_limit']} ({budget_used:.1%})")
     else:
-        print("📊 No cost data available for this period")
+        print("[DATA] No cost data available for this period")
     
     # Daily breakdown
     if summary['daily_data']:
@@ -96,7 +96,7 @@ def print_cost_report(summary: dict, days: int):
     
     # Top markets by cost
     if summary['top_markets']:
-        print(f"\n🎯 Most Expensive Markets:")
+        print(f"\n[TARGET] Most Expensive Markets:")
         for market_id, count, cost in summary['top_markets']:
             print(f"   {market_id[:40]:<40} ${cost:.3f} ({count} analyses)")
     
@@ -122,7 +122,7 @@ async def live_monitor(db_manager: DatabaseManager):
             await asyncio.sleep(30)
             
     except KeyboardInterrupt:
-        print("\n👋 Monitoring stopped")
+        print("\n[BYE] Monitoring stopped")
 
 async def main():
     parser = argparse.ArgumentParser(description="Monitor AI costs for Kalshi Trading System")

@@ -167,9 +167,9 @@ class AdvancedMarketMaker:
                     
                     if opportunity and opportunity.total_expected_profit > 0:
                         opportunities.append(opportunity)
-                        self.logger.info(f"✅ MARKET MAKING APPROVED: {market.market_id} - YES edge: {yes_edge_result.edge_percentage:.1%}, NO edge: {no_edge_result.edge_percentage:.1%}")
+                        self.logger.info(f"[OK] MARKET MAKING APPROVED: {market.market_id} - YES edge: {yes_edge_result.edge_percentage:.1%}, NO edge: {no_edge_result.edge_percentage:.1%}")
                 else:
-                    self.logger.info(f"❌ MARKET MAKING FILTERED: {market.market_id} - Insufficient edge on both sides")
+                    self.logger.info(f"[FAIL] MARKET MAKING FILTERED: {market.market_id} - Insufficient edge on both sides")
                     
             except Exception as e:
                 self.logger.error(f"Error analyzing market {market.market_id}: {e}")
@@ -442,7 +442,7 @@ class AdvancedMarketMaker:
                     # Convert cents back to dollars for display
                     display_price = order.price / 100 if order.price > 1.0 else order.price
                     self.logger.info(
-                        f"✅ LIVE limit order placed: {order.side} {order.quantity} at ${display_price:.2f} "
+                        f"[OK] LIVE limit order placed: {order.side} {order.quantity} at ${display_price:.2f} "
                         f"for market {order.market_id} (Order ID: {order.order_id})"
                     )
                 else:
@@ -455,7 +455,7 @@ class AdvancedMarketMaker:
                 order.order_id = f"sim_{order.market_id}_{order.side}_{int(datetime.now().timestamp())}"
                 
                 self.logger.info(
-                    f"📝 SIMULATED limit order placed: {order.side} {order.quantity} at {order.price:.1f}¢ "
+                    f"[NOTE] SIMULATED limit order placed: {order.side} {order.quantity} at {order.price:.1f}¢ "
                     f"for market {order.market_id}"
                 )
             

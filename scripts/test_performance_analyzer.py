@@ -13,7 +13,7 @@ async def test_performance_analyzer():
     
     logger = get_trading_logger("test_analyzer")
     
-    print("🚀 RUNNING AUTOMATED PERFORMANCE ANALYSIS WITH GROK4")
+    print("[START] RUNNING AUTOMATED PERFORMANCE ANALYSIS WITH GROK4")
     print("=" * 60)
     
     try:
@@ -21,11 +21,11 @@ async def test_performance_analyzer():
         report = await run_performance_analysis()
         
         if not report:
-            print("❌ Analysis failed or returned empty report")
+            print("[FAIL] Analysis failed or returned empty report")
             return
         
         # Display results
-        print("\n📊 ANALYSIS RESULTS")
+        print("\n[DATA] ANALYSIS RESULTS")
         print("-" * 40)
         
         # Performance data summary
@@ -55,12 +55,12 @@ async def test_performance_analyzer():
             print("-" * 40)
             print(ai_insights['fallback_analysis'])
         else:
-            print("\n⚠️ No AI analysis available")
+            print("\n[WARNING] No AI analysis available")
         
         # Action Items
         action_items = report.get('action_items', [])
         if action_items:
-            print(f"\n🎯 ACTION ITEMS:")
+            print(f"\n[TARGET] ACTION ITEMS:")
             print("-" * 40)
             for i, item in enumerate(action_items, 1):
                 priority = item.get('priority', 'Unknown')
@@ -79,7 +79,7 @@ async def test_performance_analyzer():
         
     except Exception as e:
         logger.error(f"Test failed: {e}")
-        print(f"❌ Test failed: {e}")
+        print(f"[FAIL] Test failed: {e}")
 
 if __name__ == "__main__":
     asyncio.run(test_performance_analyzer()) 
